@@ -23,8 +23,11 @@ export type AdminUserListQuery = z.output<typeof adminUserListQuerySchema>;
 
 const roleSchema = z.enum(USER_ROLES, { error: "Rol inválido" });
 
-/** Body of `POST /api/admin/users`: same rules as the public registration, plus the role. */
-export const adminUserCreateSchema = registerSchema.extend({ role: roleSchema.default("USER") });
+/**
+ * Body of `POST /api/admin/users`: same rules as the public registration, plus the role. No birth
+ * date: the checkout asks for it when the account has none.
+ */
+export const adminUserCreateSchema = registerSchema.omit({ birthDate: true }).extend({ role: roleSchema.default("USER") });
 export type AdminUserCreate = z.output<typeof adminUserCreateSchema>;
 
 /** Body of `PATCH /api/admin/users/{id}`: any of the user's data, status and role (a new password is optional). */

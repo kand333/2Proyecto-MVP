@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "@phosphor-icons/react/ssr";
 import { useEffect, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 import {
@@ -34,7 +35,7 @@ export function FlashItem({ message }: { message: FlashMessage }) {
   return (
     <li
       className={cn(
-        "pointer-events-auto flex w-full items-start gap-3 rounded-2xl border bg-surface py-3 pl-4 pr-2 text-sm text-ink shadow-lift animate-[flash-in_0.25s_ease-out]",
+        "pointer-events-auto flex w-full items-start gap-3 rounded-xl border bg-surface py-3 pl-4 pr-2 text-sm text-ink shadow-lift animate-[flash-in_0.25s_ease-out]",
         toneClassNames[message.tone],
       )}
     >
@@ -44,11 +45,9 @@ export function FlashItem({ message }: { message: FlashMessage }) {
         type="button"
         onClick={() => dismissFlash(message.id)}
         aria-label="Cerrar aviso"
-        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors duration-200 hover:bg-paper hover:text-ink"
+        className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted transition-colors duration-200 hover:bg-paper hover:text-ink"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M6 6l12 12M18 6L6 18" />
-        </svg>
+        <X aria-hidden="true" className="size-4" />
       </button>
     </li>
   );

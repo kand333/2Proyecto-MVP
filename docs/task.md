@@ -6,19 +6,19 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: —
   - done: dado `docs/design.md` escrito con `design-taste-frontend` como directora (Design Read de comercio regulado 18+, diales, paleta, tipografía, pantallas clave de portada, catálogo, ficha, carrito y checkout, movimiento solo CSS y lista de rechazo) y aplicado con `frontend-design` en los tokens claro y oscuro de `globals.css`, la fuente de `app/layout.tsx` (`next/font`), `APP_SLUG` y `site-config.ts` con "Terpenos & Vapes", cuando se renderiza el header, entonces muestra el nombre, y `docs/design.md` anota los ratios de contraste AA de texto/fondo y `on-accent`/`accent` en ambos modos
   - verify: `npm test && npm run lint && npm run typecheck`
-- [ ] **T030** Kit de UI base (WS-06 · RF-22 · M)
+- [x] **T030** Kit de UI base (WS-06 · RF-22 · M)
   - deps: T001, T004
   - done: dado `components/ui/` con Button (variantes y estado cargando), Field (label, ayuda, error), Select, Badge, Price (`formatClp`), ProductCard, Skeleton y EmptyState con iconos `@phosphor-icons/react`, y `confirm-dialog`, `flash-messages` y `pagination` alineados a `docs/design.md`, cuando corren sus tests con `renderToStaticMarkup`, entonces usan solo tokens, tienen nombre accesible y foco y deshabilitado visibles, y `web-design-guidelines` no deja hallazgos críticos en `components/ui/`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T002** Fecha de nacimiento en el registro: shared, Prisma, API y formulario (WS-02 · RF-05 · M)
+- [x] **T002** Fecha de nacimiento en el registro: shared, Prisma, API y formulario (WS-02 · RF-05 · M)
   - deps: —
   - done: dado `registerSchema` con `birthDate` obligatoria, `MIN_CUSTOMER_AGE` y `isAdult()` en shared, y `User.birthDate DateTime?` migrado, cuando se registra alguien de 17 años, entonces la API responde 422 con error en `birthDate`; con 18 años cumplidos hoy, 201. El formulario de registro web (`auth-form.tsx`) envía el campo y muestra el error junto a él, y los tests de registro existentes se actualizan, para que el registro nunca quede roto entre PRs
   - verify: `npm test && npm run lint && npm run typecheck`
-- [ ] **T003** Aviso de edad (WS-02 · RF-04 · M)
+- [x] **T003** Aviso de edad (WS-02 · RF-04 · M)
   - deps: T002, T030
   - done: dado un visitante nuevo, cuando abre una página pública, entonces ve el aviso 18+ con foco atrapado; "Soy mayor de 18" no lo vuelve a mostrar en ese navegador; "Soy menor" lleva a `/age-restricted`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T004** Contrato shared del catálogo (WS-01 · RF-01,RF-02,RF-03 · M)
+- [x] **T004** Contrato shared del catálogo (WS-01 · RF-01,RF-02,RF-03 · M)
   - deps: —
   - done: dado `packages/shared/src/product.ts` con límites, `PRODUCT_CATEGORIES`, esquemas Zod de producto con variantes (create/update/list público y admin) y `formatClp()`, cuando corren sus tests, entonces rechazan precio ≤ 0 o no entero, stock negativo, 0 o > 20 variantes y SKU duplicado dentro del producto
   - verify: `npm test -w @portal/shared && npm run typecheck -w @portal/shared`

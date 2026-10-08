@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { loadEnvConfig } from "@next/env";
 import { NextRequest } from "next/server";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
-import type { AuthUser } from "@portal/shared/auth";
+import { shopToday, type AuthUser } from "@portal/shared/auth";
 
 // Integration test: calls the real Route Handlers against the test database.
 loadEnvConfig(process.cwd());
@@ -32,9 +32,16 @@ function sessionCookie(response: Response): { value: string; attributes: string 
   return match ? { value: match[1], attributes: match[2] } : null;
 }
 
-async function register(body: unknown) {
+/** Birth date of someone who turns `age` today in Chile (February 29 falls back to the 28th). */
+function birthDateForAge(age: number): string {
+  const [year, month, day] = shopToday().split("-");
+  return `${Number(year) - age}-${month}-${month === "02" && day === "29" ? "28" : day}`;
+}
+
+/** Registers with an adult birth date unless the body sets its own. */
+async function register(body: Record<string, unknown>) {
   const { POST } = await import("@/app/api/auth/register/route");
-  return POST(jsonRequest("register", body));
+  return POST(jsonRequest("register", { birthDate: "1990-05-17", ...body }));
 }
 
 async function login(body: unknown) {
@@ -84,6 +91,27 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("auth API", () => {
     const stored = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
     expect(stored.passwordHash).toMatch(/^scrypt\$/);
     expect(stored.passwordHash).not.toContain(password);
+    expect(stored.birthDate?.toISOString()).toBe("1990-05-17T00:00:00.000Z");
+  });
+
+  it("accepts someone who turns 18 today", async () => {
+    const response = await register({ name: "Mayor", email: emailFor("adult-today"), password, birthDate: birthDateForAge(18) });
+    expect(response.status).toBe(201);
+  });
+
+  it("returns 422 for someone under 18 and does not create the account", async () => {
+    const response = await register({ name: "Menor", email: emailFor("minor"), password, birthDate: birthDateForAge(17) });
+    expect(response.status).toBe(422);
+    expect(await response.json()).toEqual({ message: "Debes tener al menos 18 años para registrarte", status: 422 });
+    expect(sessionCookie(response)).toBeNull();
+    const prisma = await getPrisma();
+    expect(await prisma.user.findUnique({ where: { email: emailFor("minor") } })).toBeNull();
+  });
+
+  it("returns 400 when the birth date is missing", async () => {
+    const response = await register({ name: "Sin fecha", email: emailFor("no-birth-date"), password, birthDate: undefined });
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ message: "Ingresa tu fecha de nacimiento", status: 400 });
   });
 
   it("returns 409 when the email already has an account", async () => {
@@ -172,7 +200,7 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("auth API", () => {
         new Request(`${baseUrl}/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "x-forwarded-for": `${ip}, 10.0.0.1` },
-          body: JSON.stringify({ name: "Límite", email: emailFor(label), password }),
+          body: JSON.stringify({ name: "Límite", email: emailFor(label), password, birthDate: "1990-05-17" }),
         }),
       );
     for (let index = 0; index < 5; index += 1) expect((await registerFrom("203.0.113.7", `ip-${index}`)).status).toBe(201);

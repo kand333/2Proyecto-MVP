@@ -10,7 +10,7 @@ type PaginationProps = {
 };
 
 const itemClassName =
-  "inline-flex h-11 min-w-11 items-center justify-center rounded-full border px-4 text-sm font-medium tabular-nums transition-colors duration-200";
+  "inline-flex h-11 min-w-11 items-center justify-center rounded-lg border px-4 text-sm font-medium tabular-nums transition-colors duration-200";
 const linkClassName =
   "border-line text-ink hover:border-accent hover:bg-surface";
 const disabledClassName = "border-line/60 text-muted/50";

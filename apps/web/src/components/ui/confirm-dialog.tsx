@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { cn } from "@/lib/cn";
+import { Button } from "./button";
 
 export type ConfirmOptions = {
   title: string;
@@ -41,7 +41,7 @@ export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
         event.preventDefault();
         onClose(false);
       }}
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-[1.25rem] border border-line bg-surface p-0 text-ink shadow-lift backdrop:bg-ink/50 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(28rem,calc(100vw-2rem))] overscroll-contain rounded-xl border border-line bg-surface p-0 text-ink shadow-lift backdrop:bg-ink/50 backdrop:backdrop-blur-sm"
     >
       {request && (
         <div className="p-6">
@@ -52,25 +52,12 @@ export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
             {request.message}
           </div>
           <div className="mt-6 flex flex-wrap justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => onClose(false)}
-              className="h-11 rounded-full border border-line px-5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-accent hover:bg-paper"
-            >
+            <Button variant="secondary" onClick={() => onClose(false)}>
               Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => onClose(true)}
-              className={cn(
-                "h-11 rounded-full px-5 text-sm font-semibold transition-colors duration-200",
-                request.tone === "danger"
-                  ? "bg-red-700 text-white hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-500"
-                  : "bg-accent text-on-accent hover:bg-accent-hover",
-              )}
-            >
+            </Button>
+            <Button variant={request.tone === "danger" ? "danger" : "primary"} onClick={() => onClose(true)}>
               {request.confirmLabel}
-            </button>
+            </Button>
           </div>
         </div>
       )}

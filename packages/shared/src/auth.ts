@@ -6,6 +6,40 @@ export const USER_EMAIL_MAX_LENGTH = 254;
 export const PASSWORD_MIN_LENGTH = 8;
 /** Upper bound so a huge password cannot make the hashing (scrypt) expensive. */
 export const PASSWORD_MAX_LENGTH = 128;
+/** Only adults can buy: the API rejects younger customers (DEC-008). */
+export const MIN_CUSTOMER_AGE = 18;
+/** Ages are counted with the calendar date of the shop (Chile). */
+export const SHOP_TIME_ZONE = "America/Santiago";
+const BIRTH_DATE_MIN = "1900-01-01";
+
+/** Today's calendar date in the shop's time zone, as `YYYY-MM-DD`. */
+export function shopToday(now: Date = new Date()): string {
+  // The en-CA locale formats dates as YYYY-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", { timeZone: SHOP_TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
+
+/**
+ * Whether someone born on `birthDate` (`YYYY-MM-DD`) is at least MIN_CUSTOMER_AGE today in Chile.
+ * Someone born on February 29 comes of age on March 1 in non-leap years.
+ */
+export function isAdult(birthDate: string, now: Date = new Date()): boolean {
+  const [year, monthAndDay] = [birthDate.slice(0, 4), birthDate.slice(4)];
+  const comingOfAge = `${String(Number(year) + MIN_CUSTOMER_AGE).padStart(4, "0")}${monthAndDay}`;
+  return comingOfAge <= shopToday(now);
+}
+
+const isCalendarDate = (value: string) => {
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+};
+
+/** A real calendar date as `YYYY-MM-DD` (the value of `<input type="date">`). The age is checked by the API. */
+export const birthDateSchema = z
+  .string({ error: "Ingresa tu fecha de nacimiento" })
+  .trim()
+  .min(1, { error: "Ingresa tu fecha de nacimiento" })
+  .regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Ingresa una fecha válida" })
+  .refine((value) => isCalendarDate(value) && value >= BIRTH_DATE_MIN, { error: "Ingresa una fecha válida" });
 
 /** Emails are compared and stored trimmed and lowercase. */
 const emailSchema = z
@@ -28,7 +62,11 @@ export const registerSchema = z.object({
     .string({ error: "Ingresa una contraseña" })
     .min(PASSWORD_MIN_LENGTH, { error: `La contraseña debe tener al menos ${PASSWORD_MIN_LENGTH} caracteres` })
     .max(PASSWORD_MAX_LENGTH, { error: `La contraseña admite hasta ${PASSWORD_MAX_LENGTH} caracteres` }),
+  birthDate: birthDateSchema,
 });
+
+/** Message of the 422 the API returns when the person is under MIN_CUSTOMER_AGE. */
+export const UNDERAGE_MESSAGE = `Debes tener al menos ${MIN_CUSTOMER_AGE} años para registrarte`;
 
 /** Body of `POST /api/auth/login`. */
 export const loginSchema = z.object({

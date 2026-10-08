@@ -5,17 +5,23 @@ import type { Session } from "@/lib/auth/session-token";
 import { hashPassword, verifyPassword, verifyPasswordAgainstDummy } from "@/lib/auth/password";
 import { ApiError } from "@/lib/http/api-error";
 import { findUserById, findUserCredentialsByEmail, insertUser, touchLastSeen, type UserRecord } from "@/repositories/user-repository";
-import type { AuthUser, LoginData, RegisterData } from "@portal/shared/auth";
+import { isAdult, UNDERAGE_MESSAGE, type AuthUser, type LoginData, type RegisterData } from "@portal/shared/auth";
 
 const INVALID_CREDENTIALS = "Email o contraseña incorrectos";
 
 export const toAuthUser = ({ id, name, email, role, isActive }: UserRecord): AuthUser => ({ id, name, email, role, isActive });
 
-/** Creates a USER account. The email arrives normalized (trimmed, lowercase) from the schema. */
-export async function registerUser(data: RegisterData): Promise<AuthUser> {
+/**
+ * Creates a USER account for an adult (DEC-008). The email arrives normalized (trimmed, lowercase)
+ * and the birth date as a valid `YYYY-MM-DD` from the schema.
+ */
+export async function registerUser(data: RegisterData, now = new Date()): Promise<AuthUser> {
+  if (!isAdult(data.birthDate, now)) throw new ApiError(422, UNDERAGE_MESSAGE);
   const passwordHash = await hashPassword(data.password);
+  // A calendar date: stored at UTC midnight in a `date` column.
+  const birthDate = new Date(`${data.birthDate}T00:00:00Z`);
   try {
-    return toAuthUser(await insertUser({ name: data.name, email: data.email, passwordHash }));
+    return toAuthUser(await insertUser({ name: data.name, email: data.email, passwordHash, birthDate }));
   } catch (error) {
     // The unique index on email also covers two registrations at the same time.
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {

@@ -1,10 +1,13 @@
 "use client";
 
 import {
+  isAdult,
   loginSchema,
+  MIN_CUSTOMER_AGE,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   registerSchema,
+  UNDERAGE_MESSAGE,
   USER_EMAIL_MAX_LENGTH,
   USER_NAME_MAX_LENGTH,
 } from "@portal/shared/auth";
@@ -17,12 +20,12 @@ import { getSafeRedirectPath, logIn, logOut, registerAccount } from "@/lib/auth-
 import { AuthFormField } from "./auth-form-field";
 
 type Mode = "login" | "register";
-type FieldName = "name" | "email" | "password";
+type FieldName = "name" | "email" | "password" | "birthDate";
 type FieldErrors = Partial<Record<FieldName, string>>;
 
 const copy = {
   login: { submit: "Ingresar", sending: "Ingresando…", fields: ["email", "password"] as FieldName[] },
-  register: { submit: "Crear cuenta", sending: "Creando cuenta…", fields: ["name", "email", "password"] as FieldName[] },
+  register: { submit: "Crear cuenta", sending: "Creando cuenta…", fields: ["name", "email", "password", "birthDate"] as FieldName[] },
 };
 
 /** Login and registration form. After success it goes to `?next=` (only paths of this site) or home. */
@@ -30,7 +33,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: currentUser } = useCurrentUser();
-  const [values, setValues] = useState<Record<FieldName, string>>({ name: "", email: "", password: "" });
+  const [values, setValues] = useState<Record<FieldName, string>>({
+    name: "",
+    email: "",
+    password: "",
+    birthDate: "",
+  });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -54,6 +62,8 @@ export function AuthForm({ mode }: { mode: Mode }) {
     if (firstInvalid) document.getElementById(`auth-${firstInvalid}`)?.focus();
   }
 
+  const showUnderage = () => showFieldErrors([{ path: ["birthDate"], message: UNDERAGE_MESSAGE }]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSending) return;
@@ -67,6 +77,8 @@ export function AuthForm({ mode }: { mode: Mode }) {
     } else {
       const parsed = registerSchema.safeParse(values);
       if (!parsed.success) return showFieldErrors(parsed.error.issues);
+      // The API has the last word (422), checked here too so the error shows without a round trip.
+      if (!isAdult(parsed.data.birthDate)) return showUnderage();
       send = () => registerAccount(parsed.data);
     }
 
@@ -75,9 +87,13 @@ export function AuthForm({ mode }: { mode: Mode }) {
       await send();
       router.replace(redirectPath);
     } catch (error) {
-      setFormError(
-        error instanceof ApiClientError ? error.message : "No pudimos conectar con el servidor. Inténtalo de nuevo.",
-      );
+      if (mode === "register" && error instanceof ApiClientError && error.status === 422) {
+        showFieldErrors([{ path: ["birthDate"], message: error.message }]);
+      } else {
+        setFormError(
+          error instanceof ApiClientError ? error.message : "No pudimos conectar con el servidor. Inténtalo de nuevo.",
+        );
+      }
       // Never keep a rejected password in the form.
       setValues((previous) => ({ ...previous, password: "" }));
       setIsSending(false);
@@ -147,6 +163,19 @@ export function AuthForm({ mode }: { mode: Mode }) {
         onChange={handleChange}
         error={fieldErrors.password}
       />
+      {mode === "register" && (
+        <AuthFormField
+          id="auth-birthDate"
+          name="birthDate"
+          label={`Fecha de nacimiento (mayores de ${MIN_CUSTOMER_AGE} años)`}
+          type="date"
+          autoComplete="bday"
+          min="1900-01-01"
+          value={values.birthDate}
+          onChange={handleChange}
+          error={fieldErrors.birthDate}
+        />
+      )}
 
       {formError && (
         <p role="alert" className="text-sm text-red-700 dark:text-red-400">

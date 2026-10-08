@@ -9,3 +9,6 @@ export const SESSION_COOKIE_NAME = `${APP_SLUG}_session`;
 
 /** sessionStorage key of the pending flash messages. */
 export const FLASH_STORAGE_KEY = `${APP_SLUG}:flash`;
+
+/** localStorage key that remembers the visitor declared being an adult (age notice, RF-04). */
+export const AGE_GATE_STORAGE_KEY = `${APP_SLUG}:age-confirmed`;

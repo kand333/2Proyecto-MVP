@@ -56,7 +56,7 @@ describe("login, registration and logout", () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json(user, { status: 201 }));
     vi.stubGlobal("fetch", fetchMock);
 
-    await registerAccount({ name: "Ana", email: "ana@example.com", password: "clave segura" });
+    await registerAccount({ name: "Ana", email: "ana@example.com", password: "clave segura", birthDate: "1990-05-17" });
     expect(fetchMock.mock.calls[0][0]).toBe("/api/auth/register");
     expect(mutateMock).toHaveBeenCalledWith("/api/auth/me", user, { revalidate: false });
     expect(flashMock).toHaveBeenCalledWith("Cuenta creada. Te damos la bienvenida, Ana.");

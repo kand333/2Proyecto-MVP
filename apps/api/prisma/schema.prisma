@@ -23,6 +23,8 @@ model User {
   name         String
   role         UserRole @default(USER)
   isActive     Boolean  @default(true)
+  // Declared at registration (calendar date, no time). Null for accounts created before it was asked.
+  birthDate    DateTime? @db.Date
   // Sessions issued before this instant are rejected: set when the password changes (logs out other devices).
   sessionsValidAfter DateTime?
   // Last authenticated request (refreshed at most once a minute): "online" and "last connection" in the admin list.

@@ -59,6 +59,6 @@ export function updateUser(
   return prisma.user.update({ where: { id }, data, select: publicUserSelect });
 }
 
-export function insertUser(data: { name: string; email: string; passwordHash: string }): Promise<UserRecord> {
+export function insertUser(data: { name: string; email: string; passwordHash: string; birthDate: Date }): Promise<UserRecord> {
   return prisma.user.create({ data, select: publicUserSelect });
 }

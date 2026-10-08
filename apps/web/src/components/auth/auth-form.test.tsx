@@ -19,15 +19,19 @@ describe("AuthForm", () => {
   it("asks for email and current password to log in", () => {
     const html = renderToStaticMarkup(<AuthForm mode="login" />);
     expect(html).not.toContain('id="auth-name"');
+    expect(html).not.toContain('id="auth-birthDate"');
     expect(html).toMatch(/id="auth-email"[^>]*type="email"|type="email"[^>]*id="auth-email"/);
     expect(html).toContain('autoComplete="current-password"');
     expect(html).toContain(">Ingresar</button>");
     expect(html).toContain('href="/register"');
   });
 
-  it("asks for name, email and a new password to register", () => {
+  it("asks for name, email, a new password and the birth date to register", () => {
     const html = renderToStaticMarkup(<AuthForm mode="register" />);
     expect(html).toContain('id="auth-name"');
+    expect(html).toMatch(/id="auth-birthDate"[^>]*type="date"/);
+    expect(html).toContain('autoComplete="bday"');
+    expect(html).toContain("Fecha de nacimiento (mayores de 18 años)");
     expect(html).toContain('autoComplete="new-password"');
     expect(html).toContain("Contraseña (mínimo 8 caracteres)");
     expect(html).toContain(">Crear cuenta</button>");
