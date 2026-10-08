@@ -60,15 +60,22 @@ Respuesta final (≤ 10 líneas): estado, nº de WS/RF/tareas, primera tarea, su
 2. Lee la tarea, sus RF en spec.md, su WS en plan.md y las DEC citadas. Lee solo el código que vas a tocar.
 3. Implementa siguiendo `CLAUDE.md` (capas, convenciones, tests). Toda funcionalidad nueva lleva test.
 4. Corre el `verify` de la tarea y la verificación mínima que exija `CLAUDE.md` para ese tipo de cambio. Si falla, arregla; no marques `[x]` con verificación roja.
-5. Actualiza `docs/task.md`: `[x]` y, si hay PR, `  - pr: #N`. Decisión estructural tomada → nueva DEC.
+5. Actualiza `docs/task.md`: `[x]`. Decisión estructural tomada → nueva DEC.
 6. Una tarea por ejecución. Encadenar varias produce PRs imposibles de revisar.
 
 **Para y pide ayuda humana** (sin usuario: explícalo en la respuesta y deja la tarea sin marcar) si la tarea requiere: secretos o variables nuevas, despliegue o datos de producción, una dependencia no aprobada, o contradice `CLAUDE.md`.
 
-### En GitHub Actions
-- El trabajo va en la rama que crea la action. Haz commits pequeños con mensaje en inglés (`feat(ws-01): T003 admin products endpoint`).
-- Al terminar, abre el PR con `gh pr create --fill` (o con título `T003 · <título>` y cuerpo con RF, `verify` ejecutado y resultado). Si no está permitido, deja el enlace de PR que da la action.
-- Nunca hagas merge ni push a `main`.
+## En GitHub Actions (ambos modos)
+El usuario quiere un flujo sin clics: tú abres el PR; él solo revisa y hace merge.
+1. Trabaja en la rama que crea la action. Commits pequeños, mensaje en inglés (`docs: contract for items CSV export`, `feat(ws-01): T003 admin products endpoint`).
+2. Tras el push, abre el PR tú mismo (en este repo está permitido, aunque la action por defecto solo deje un enlace):
+   ```
+   gh pr create --base main --title "<T003 · título | docs: contrato de …>" --body "<resumen> … Refs #<issue>"
+   ```
+   Cuerpo: qué cambia, `verify` ejecutado y su resultado, supuestos. Usa `Refs #N`, no `Closes`: el issue sigue siendo el hilo para el próximo `next`. Solo en la última tarea usa `Closes #N`.
+3. Pon el enlace del PR en tu comentario final y recuerda que hay que hacer merge antes del siguiente `next` (cada ejecución parte de `main`).
+4. Si `gh pr create` falla, deja el enlace de PR que da la action y el error.
+5. Nunca hagas merge ni push a `main`.
 
 ## Referencias
 | Archivo | Cuándo |

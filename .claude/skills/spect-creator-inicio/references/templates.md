@@ -87,7 +87,6 @@ Una tarea = una sesión = un PR. Orden topológico. `XL` significa "divídela".
   - deps: T001
   - done: …
   - verify: …
-  - pr: #12
 ```
 
 - `[x]` solo tras ejecutar `verify` con éxito.
