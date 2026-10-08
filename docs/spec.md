@@ -38,8 +38,8 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 - deps: WS-03
 - Aceptación: dado un pedido `PENDING_PAYMENT`, cuando el admin lo marca pagado y luego enviado con número de seguimiento, entonces el cliente ve ambos estados.
 
-### WS-06 · Identidad y legal · S
-- Objetivo: la plantilla deja de parecer el starter y muestra la información legal mínima.
+### WS-06 · Identidad, diseño y legal · M
+- Objetivo: la tienda tiene una dirección visual propia y coherente en todas las pantallas, y muestra la información legal mínima.
 - deps: —
 - Aceptación: dado cualquier página pública, cuando se carga, entonces muestra el nombre de la tienda y enlaces a términos, privacidad, envíos y advertencia sanitaria.
 
@@ -60,18 +60,19 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 - **RF-14** (WS-04) Admin ve en `/admin/subscribers` los suscriptores paginados con fecha y si canjearon el código.
 - **RF-15** (WS-05) Admin lista pedidos en `/admin/orders` (filtro por estado, búsqueda por número o email, paginado), ve el detalle y aplica transiciones válidas: `PENDING_PAYMENT→PAID|CANCELLED`, `PAID→SHIPPED|DELIVERED|CANCELLED`, `SHIPPED→DELIVERED`. `SHIPPED` exige número de seguimiento. Cancelar repone stock y libera el código de descuento. Dada una transición inválida, entonces 409.
 - **RF-16** (WS-05) Un cliente con cuenta ve sus pedidos en `/account/orders` y su detalle; los pedidos como invitado con el mismo email no se vinculan.
-- **RF-17** (WS-06) Identidad: nombre de la tienda, `APP_SLUG`, metadatos y paleta propia en los tokens de `globals.css`.
+- **RF-17** (WS-06) Dirección de diseño e identidad: `docs/design.md` define la dirección visual (DEC-013) y la tienda la aplica: nombre, `APP_SLUG`, metadatos, tokens claro y oscuro de `globals.css` y tipografía.
 - **RF-18** (WS-06) Páginas `/legal/terms`, `/legal/privacy`, `/legal/shipping` y `/legal/health-warning`, enlazadas en el footer. Contenido inicial con texto marcado "Borrador pendiente de revisión legal".
 - **RF-19** (WS-06) Retirar la capa pública de Item según la receta de `CLAUDE.md`; el módulo admin de Item se conserva (DEC-009).
 - **RF-21** (WS-01) Fotos de producto: el admin sube hasta 8 fotos JPG, PNG o WebP de ≤ 5 MB por producto y puede borrarlas; la primera subida es la portada. El catálogo muestra la portada (o un marcador neutro si no hay) y la ficha, la galería. Dado un archivo que no es imagen por su contenido (aunque se llame `.jpg`), cuando lo sube, entonces 415; > 5 MB → 413; sin claves de Cloudinary configuradas → 503 y el resto de la tienda funciona (DEC-012).
 - **RF-20** (WS-04) Admin descarga desde `/admin/subscribers` un CSV con los suscriptores (`email,code,consentAt,redeemedAt`, más recientes primero, máx. 10 000 filas): RFC 4180, BOM UTF-8 y celdas que empiezan por `=`, `+`, `-`, `@`, tab o CR prefijadas con `'` (DEC-011). Dado un USER, cuando pide el CSV, entonces 403.
+- **RF-22** (WS-06) Calidad de UI: componentes base reutilizables en `components/ui/`, solo tokens e iconos Phosphor (DEC-014); contraste AA en ambos modos, foco visible, 375 px sin desborde y animaciones solo CSS desactivadas con `prefers-reduced-motion`. Dada la auditoría de `web-design-guidelines` sobre las páginas, entonces no hay hallazgos críticos.
 
 ## No funcionales
 - Dinero en CLP como entero (DEC-003); sin decimales en la UI (`$12.990`).
 - Toda entrada validada con esquemas de `@portal/shared`; autorización en cada handler y página privada según `CLAUDE.md`.
 - Límites de frecuencia en suscripción, cotización y creación de pedidos (`lib/http/rate-limit.ts`).
 - Responsive desde 375 px, sin desborde; accesible por teclado (popup y aviso de edad con foco atrapado y `Escape` donde corresponda).
-- Sin dependencias nuevas.
+- Sin dependencias nuevas salvo `@phosphor-icons/react` (DEC-014).
 
 ## Casos límite
 - Dos compradores piden la última unidad a la vez: solo uno crea el pedido (RF-08).

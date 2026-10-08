@@ -88,3 +88,19 @@
 - Autorizado de forma explícita para el implementador: añadir los nombres `CLOUDINARY_*` (vacíos) a `.env.example` y a los tests de env, y el bloque `images` en `apps/web/next.config.ts`. Los valores de las claves los carga el usuario; sin ellos, la subida responde 503 y el resto funciona, así que los tests y el modo noche no dependen del secreto.
 - Impacto: WS-01, RF-01, RF-21, T004, T010, T028, T029.
 - Rollback: sección "Reversión" de la receta.
+
+## DEC-013 · Diseño dirigido por design-taste-frontend
+- Fecha: 2026-10-08 · Estado: aprobada
+- Problema: 30 tareas de UI implementadas por separado (muchas de noche) derivan en estéticas distintas.
+- Evidencia: el usuario pidió priorizar el diseño con las skills del proyecto y `design-taste-frontend` como directora.
+- Elegida: una sola dirección visual en `docs/design.md` (T001) antes de cualquier pantalla; kit de UI base (T030) del que dependen las tareas de UI; auditoría al cerrar cada tarea de UI y una final (T031). Roles: taste dirige, `frontend-design` ejecuta identidad, `react-rules` guía el código y `web-design-guidelines` audita. Precedencia: `CLAUDE.md` > `docs/design.md` > skills; lo que taste recomiende fuera del stack (Motion, Zustand, otros design systems, imágenes de picsum) no aplica.
+- Impacto: WS-06, RF-17, RF-22, T001, T030, T031 y las deps de T003, T009, T010, T012, T021, T025, T026.
+- Rollback: —
+
+## DEC-014 · Phosphor como única librería de iconos; animación solo CSS
+- Fecha: 2026-10-08 · Estado: aprobada
+- Problema: taste prohíbe dibujar iconos a mano y recomienda Motion; `CLAUDE.md` prohíbe dependencias sin aprobación.
+- Evidencia: el usuario aprobó `@phosphor-icons/react` y eligió animaciones solo con CSS.
+- Elegida: `@phosphor-icons/react@2.1.10` (exacta) en `apps/web`, instalada fuera de la cola para que el modo noche no instale nada. Sin Motion: transiciones y keyframes CSS con `prefers-reduced-motion`.
+- Impacto: WS-06, RF-22, T030.
+- Rollback: quitar la dependencia y sustituir los iconos.

@@ -75,6 +75,16 @@ Respuesta final (≤ 10 líneas): estado, nº de WS/RF/tareas, primera tarea, su
 6. Actualiza `docs/task.md`: `[x]`. Decisión estructural tomada → nueva DEC. Si lo implementado cambia lo que asume una tarea posterior (nombre, ruta, firma), ajusta esa tarea ahora para que el próximo `next` no parta de un dato falso.
 7. Una tarea por ejecución. Encadenar varias produce PRs imposibles de revisar.
 
+### Tareas con UI
+Una UI coherente sale de una sola dirección, no de 30 PRs que deciden cada uno su estética.
+- Si existe `docs/design.md`, es la fuente de verdad visual: no inventes colores, tipografías ni patrones fuera de él. Si algo falta, amplíalo ahí (cambio mínimo) en vez de decidir en el componente.
+- Si el repo tiene estas skills, úsalas con estos roles (las ausentes, ignóralas):
+  - `design-taste-frontend` dirige: su Design Read y sus criterios de rechazo deciden; consúltala antes de componer una página.
+  - `frontend-design` ejecuta identidad: tokens y tipografía.
+  - `react-rules` guía el código de componentes (solo sus reglas generales).
+  - `web-design-guidelines` cierra: antes de marcar `[x]`, audita los archivos de UI tocados; corrige los hallazgos o lista en el PR los que dejas y por qué.
+- Precedencia: `CLAUDE.md` > `docs/design.md` > las skills. Una recomendación de skill que pida dependencias o librerías no aprobadas no aplica.
+
 **Para y pide ayuda humana** (sin usuario: explícalo en la respuesta y deja la tarea sin marcar) si la tarea requiere: secretos o variables nuevas, despliegue o datos de producción, una dependencia no aprobada, o contradice `CLAUDE.md`.
 
 ## En GitHub Actions (ambos modos)

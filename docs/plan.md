@@ -11,8 +11,10 @@
 
 ## Diseño por workstream
 
-### WS-06 · Identidad y legal
-- T001: `packages/shared/src/app-config.ts` (`APP_SLUG`), `apps/web/src/lib/site-config.ts`, tokens en `globals.css` (usa la skill `frontend-design` solo para la paleta).
+### WS-06 · Identidad, diseño y legal
+- Orquestación (DEC-013): `design-taste-frontend` dirige y escribe `docs/design.md` (T001); `frontend-design` aplica tokens y fuente; `react-rules` guía el código de componentes; `web-design-guidelines` audita al cerrar cada tarea de UI y en T031.
+- T001: `docs/design.md`, `packages/shared/src/app-config.ts` (`APP_SLUG`), `apps/web/src/lib/site-config.ts`, tokens en `globals.css`, fuente en `app/layout.tsx`.
+- T030: `components/ui/*`; reutiliza `confirm-dialog`, `flash-messages` y `pagination` en vez de duplicarlos.
 - T023: receta de `CLAUDE.md` para quitar la capa pública de Item; quitar la entrada "Items" de `lib/admin-navigation.ts` (DEC-009).
 - T025: páginas estáticas en `app/(site)/legal/*`; enlaces en `components/layout/site-footer.tsx`.
 

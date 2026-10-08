@@ -111,3 +111,20 @@ Una tarea = una sesión = un PR. Orden topológico. `XL` significa "divídela".
 ```
 
 Registra una DEC cuando la decisión cambie estructura (modelo, contrato, dependencia, auth) o resuelva un conflicto entre fuentes. Lo trivial no.
+
+---
+
+## docs/design.md — dirección visual (opcional)
+
+Solo en proyectos con UI propia. Lo escribe la tarea de dirección de diseño; las tareas de UI lo leen y lo amplían en lugar de decidir por su cuenta. `trace-check` no lo valida.
+
+```markdown
+# Dirección de diseño
+## Design Read        una línea: audiencia, tono, restricciones (regulación, accesibilidad)
+## Diales             variación / movimiento / densidad (1-10) y por qué
+## Identidad          paleta → tokens de globals.css, tipografía, radios, sombras
+## Componentes        inventario base y su uso (dónde vive cada uno)
+## Pantallas clave    estructura de cada página principal (bloques en orden, no píxeles)
+## Movimiento         qué se anima, cómo, y su versión con reduced-motion
+## Rechazo            lo que no se hace en este proyecto (tells genéricos, patrones prohibidos)
+```

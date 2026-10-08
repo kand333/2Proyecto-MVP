@@ -2,16 +2,20 @@
 
 Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritorio y 375 px) la hace quien revisa el PR; anótalo en el cuerpo.
 
-- [ ] **T001** Identidad de la tienda (WS-06 · RF-17 · S)
+- [ ] **T001** Dirección de diseño e identidad (WS-06 · RF-17 · M)
   - deps: —
-  - done: dado `APP_SLUG`, `site-config.ts` y los tokens de `globals.css` con el nombre provisional "Terpenos & Vapes" y una paleta propia, cuando se renderiza el header, entonces muestra ese nombre y los tests existentes siguen verdes
+  - done: dado `docs/design.md` escrito con `design-taste-frontend` como directora (Design Read de comercio regulado 18+, diales, paleta, tipografía, pantallas clave de portada, catálogo, ficha, carrito y checkout, movimiento solo CSS y lista de rechazo) y aplicado con `frontend-design` en los tokens claro y oscuro de `globals.css`, la fuente de `app/layout.tsx` (`next/font`), `APP_SLUG` y `site-config.ts` con "Terpenos & Vapes", cuando se renderiza el header, entonces muestra el nombre, y `docs/design.md` anota los ratios de contraste AA de texto/fondo y `on-accent`/`accent` en ambos modos
   - verify: `npm test && npm run lint && npm run typecheck`
+- [ ] **T030** Kit de UI base (WS-06 · RF-22 · M)
+  - deps: T001, T004
+  - done: dado `components/ui/` con Button (variantes y estado cargando), Field (label, ayuda, error), Select, Badge, Price (`formatClp`), ProductCard, Skeleton y EmptyState con iconos `@phosphor-icons/react`, y `confirm-dialog`, `flash-messages` y `pagination` alineados a `docs/design.md`, cuando corren sus tests con `renderToStaticMarkup`, entonces usan solo tokens, tienen nombre accesible y foco y deshabilitado visibles, y `web-design-guidelines` no deja hallazgos críticos en `components/ui/`
+  - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T002** Fecha de nacimiento en el registro: shared, Prisma, API y formulario (WS-02 · RF-05 · M)
   - deps: —
   - done: dado `registerSchema` con `birthDate` obligatoria, `MIN_CUSTOMER_AGE` y `isAdult()` en shared, y `User.birthDate DateTime?` migrado, cuando se registra alguien de 17 años, entonces la API responde 422 con error en `birthDate`; con 18 años cumplidos hoy, 201. El formulario de registro web (`auth-form.tsx`) envía el campo y muestra el error junto a él, y los tests de registro existentes se actualizan, para que el registro nunca quede roto entre PRs
   - verify: `npm test && npm run lint && npm run typecheck`
 - [ ] **T003** Aviso de edad (WS-02 · RF-04 · M)
-  - deps: T002
+  - deps: T002, T030
   - done: dado un visitante nuevo, cuando abre una página pública, entonces ve el aviso 18+ con foco atrapado; "Soy mayor de 18" no lo vuelve a mostrar en ese navegador; "Soy menor" lleva a `/age-restricted`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T004** Contrato shared del catálogo (WS-01 · RF-01,RF-02,RF-03 · M)
@@ -35,11 +39,11 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - done: dado `npm run db:seed` ejecutado dos veces, cuando se consulta la BD, entonces hay 8 productos demo (2 por categoría) con variantes, sin duplicados
   - verify: `npm run db:seed -w @portal/api && npm run db:seed -w @portal/api && npm test -w @portal/api`
 - [ ] **T009** Admin web de productos (WS-01 · RF-01 · L)
-  - deps: T006
+  - deps: T006, T030
   - done: dado `/admin/products`, `/admin/products/new` y `/admin/products/[id]/edit` (cada página con `getAdminUser`) y la entrada en `lib/admin-navigation.ts`, cuando el admin crea un producto con 2 variantes, entonces aparece en el listado con `flash()` y los errores 409 se muestran junto al campo
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T010** Catálogo y ficha públicos (WS-01 · RF-02,RF-03 · L)
-  - deps: T007, T001
+  - deps: T007, T030
   - done: dado `/products` con filtros en la URL y `/products/[slug]` con selector de variante, cuando la variante elegida tiene stock 0, entonces muestra "Agotado" y deshabilita "Añadir al carrito"; las categorías `VAPES` y `E_LIQUIDS` muestran la advertencia sanitaria; sin fotos (llegan en T029) se ve un marcador neutro; la portada enlaza al catálogo
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T011** Ajustes de tienda: modelo y API (WS-03 · RF-10 · M)
@@ -47,7 +51,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - done: dado `ShopSettings` (fila única creada por migración con valores por defecto), `GET/PUT /api/admin/settings` con `requireAdmin` y `GET /api/settings` público sin datos internos, cuando corre `tests/settings-api.test.ts`, entonces cubre 200, 400 (montos negativos), 401/403
   - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm run typecheck`
 - [ ] **T012** Admin web de ajustes (WS-03 · RF-10 · S)
-  - deps: T011
+  - deps: T011, T030
   - done: dado `/admin/settings` con `getAdminUser`, cuando el admin guarda una tarifa nueva, entonces ve `flash()` y el valor persiste al recargar
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T013** Contrato y modelo de pedidos (WS-03 · RF-08,RF-09 · M)
@@ -83,7 +87,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - done: dado `GET /api/admin/orders`, `GET /api/admin/orders/[id]` y `PATCH /api/admin/orders/[id]/status` con `requireAdmin`, cuando corre `tests/orders-admin-api.test.ts`, entonces cubre cada transición válida, 409 en las inválidas, 400 en `SHIPPED` sin seguimiento, y cancelar repone stock y libera el código
   - verify: `npm test -w @portal/api && npm run typecheck`
 - [ ] **T021** Admin web de pedidos (WS-05 · RF-15 · L)
-  - deps: T020
+  - deps: T020, T030
   - done: dado `/admin/orders` (filtros en la URL) y `/admin/orders/[id]` con `getAdminUser`, cuando el admin marca un pedido pagado y luego enviado con seguimiento, entonces los botones solo ofrecen transiciones válidas, cancelar pide confirmación (`ConfirmDialog`) y cada cambio muestra `flash()`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T022** Mis pedidos (WS-05 · RF-16 · M)
@@ -100,11 +104,11 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - done: dado el proveedor elegido en modo prueba, cuando el cliente paga, entonces el webhook verificado marca el pedido `PAID`
   - verify: `npm test -w @portal/api && npm run typecheck`
 - [ ] **T025** Páginas legales y advertencia sanitaria (WS-06 · RF-18 · S)
-  - deps: T001
+  - deps: T030
   - done: dado `/legal/terms`, `/legal/privacy`, `/legal/shipping` y `/legal/health-warning` con texto marcado "Borrador pendiente de revisión legal", cuando se abre cualquier página pública, entonces el footer enlaza las cuatro
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T026** Admin web de suscriptores (WS-04 · RF-14 · S)
-  - deps: T015
+  - deps: T015, T030
   - done: dado `/admin/subscribers` con `getAdminUser` y entrada en la navegación admin, cuando hay 15 suscriptores, entonces se ven paginados con fecha y estado de canje
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T027** Exportar suscriptores a CSV (WS-04 · RF-20 · M)
@@ -118,4 +122,8 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
 - [ ] **T029** Fotos de producto en la web (WS-01 · RF-21 · M)
   - deps: T028, T009, T010
   - done: dado el uploader en `/admin/products/[id]/edit` (`postForm` de `lib/api-client.ts`, errores junto al campo, borrar con `ConfirmDialog`), `lib/image-loader.ts` y el bloque `images` en `apps/web/next.config.ts` (sin tocar `agentRules`), cuando un producto tiene 3 fotos, entonces el catálogo muestra la primera con `next/image` y la ficha las 3 con texto alternativo
+  - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
+- [ ] **T031** Auditoría final de UI (WS-06 · RF-22 · M)
+  - deps: T012, T016, T021, T022, T023, T025, T026, T029
+  - done: dado `web-design-guidelines` sobre `apps/web/src/app/**` y `apps/web/src/components/**` y la lista de rechazo de `docs/design.md`, cuando termina la tarea, entonces no quedan hallazgos críticos, los menores aceptados se listan en el PR y ninguna página desborda a 375 px
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`

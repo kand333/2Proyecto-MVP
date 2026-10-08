@@ -89,6 +89,7 @@ Toda funcionalidad nueva lleva su test (Vitest; componentes con `renderToStaticM
 
 - `web-design-guidelines`: al crear o auditar UI (descarga las reglas vigentes). No para cambios sin efecto visual.
 - `frontend-design`: al definir la identidad visual de un proyecto nuevo (cambia tokens, no componentes sueltos).
+- `design-taste-frontend` (externa): directora de diseño; su dirección vive en `docs/design.md` y manda sobre las demás skills de UI (DEC-013). De su stack solo aplica `@phosphor-icons/react` (DEC-014): sin Motion (animación solo CSS), design systems, Zustand ni picsum.
 - `react-rules`: solo sus reglas generales. No introduzcas Zustand, React Hook Form ni React Query (se usan SWR, `useState` y la URL).
 
 ## Alcance y git

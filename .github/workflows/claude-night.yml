@@ -91,7 +91,7 @@ jobs:
             4. No hagas merge: este workflow lo hace solo si lint, typecheck y tests pasan.
             5. Si la tarea necesita a un humano o no logras dejarla en verde, abre el PR igualmente con `--draft` y explica el bloqueo en el cuerpo.
           claude_args: |
-            --allowedTools "Edit,Write,MultiEdit,Bash(git checkout *),Bash(git switch *),Bash(git add *),Bash(git commit *),Bash(git push -u origin night/*),Bash(git status *),Bash(git diff *),Bash(git log *),Bash(gh pr create *),Bash(npm test *),Bash(npm run test *),Bash(npm run lint *),Bash(npm run typecheck *),Bash(npm run build *),Bash(npm run db:migrate *),Bash(npm run db:generate *),Bash(npm run db:seed *),Bash(npx vitest *),Bash(node .claude/skills/spect-creator-inicio/scripts/*),Bash(node --test *)"
+            --allowedTools "WebFetch(domain:raw.githubusercontent.com),Edit,Write,MultiEdit,Bash(git checkout *),Bash(git switch *),Bash(git add *),Bash(git commit *),Bash(git push -u origin night/*),Bash(git status *),Bash(git diff *),Bash(git log *),Bash(gh pr create *),Bash(npm test *),Bash(npm run test *),Bash(npm run lint *),Bash(npm run typecheck *),Bash(npm run build *),Bash(npm run db:migrate *),Bash(npm run db:generate *),Bash(npm run db:seed *),Bash(npx vitest *),Bash(node .claude/skills/spect-creator-inicio/scripts/*),Bash(node --test *)"
 
       - name: Find the night PR
         if: steps.guard.outputs.run == 'true'
