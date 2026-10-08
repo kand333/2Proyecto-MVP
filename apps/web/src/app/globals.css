@@ -3,30 +3,30 @@
 /*
  * Design tokens. Components use only these roles (bg-paper, text-ink, border-line, bg-accent…),
  * never raw palette colors, so a project changes its look here. Dark mode keeps the same roles.
- * Neutral defaults: replace the values (and the font in app/layout.tsx) for each project.
+ * Direction and contrast ratios: docs/design.md. Font: app/layout.tsx.
  */
 :root {
-  --paper: #fafafa;
+  --paper: #f6f8f5;
   --surface: #ffffff;
-  --ink: #18181b;
-  --muted: #52525b;
-  --line: #e4e4e7;
-  --accent: #18181b;
-  --accent-hover: #3f3f46;
-  --on-accent: #fafafa;
-  --shadow-ink: 24 24 27;
+  --ink: #14211b;
+  --muted: #4a5a51;
+  --line: #dbe2dc;
+  --accent: #1f6048;
+  --accent-hover: #174a37;
+  --on-accent: #f6f8f5;
+  --shadow-ink: 20 33 27;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #0f1012;
-    --surface: #18181b;
-    --ink: #f4f4f5;
-    --muted: #a1a1aa;
-    --line: #2e2e33;
-    --accent: #f4f4f5;
-    --accent-hover: #d4d4d8;
-    --on-accent: #18181b;
+    --paper: #0d1310;
+    --surface: #141c17;
+    --ink: #eef3ef;
+    --muted: #9fb1a6;
+    --line: #26332b;
+    --accent: #6fd0a0;
+    --accent-hover: #8fdcb6;
+    --on-accent: #0d1310;
     --shadow-ink: 0 0 0;
   }
 }

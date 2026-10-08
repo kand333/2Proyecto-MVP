@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import { FlashMessages } from "@/components/ui/flash-messages";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 // The only font by default (globals.css maps both `font-sans` and `font-display` to it).
-const inter = Inter({
+const geist = Geist({
   variable: "--font-sans-family",
   subsets: ["latin"],
 });
@@ -36,7 +36,7 @@ export const viewport: Viewport = {
 /** Shared document shell. The public site (`(site)`) and `/admin` each add their own chrome. */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang={siteConfig.locale} className={`${inter.variable} h-full antialiased`}>
+    <html lang={siteConfig.locale} className={`${geist.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <FlashMessages />

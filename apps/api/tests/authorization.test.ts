@@ -17,7 +17,7 @@ async function getPrisma() {
 
 async function requestWithSession(userId?: string) {
   const { createSessionToken } = await import("@/lib/auth/session-token");
-  const headers = userId ? { cookie: `starter_session=${createSessionToken(userId)}` } : undefined;
+  const headers = userId ? { cookie: `terpenos_session=${createSessionToken(userId)}` } : undefined;
   return new NextRequest("http://localhost:3000/api/protected", { headers });
 }
 
@@ -68,7 +68,7 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("authorization guards", () =>
     expect(await rejection(requireUser(await requestWithSession()))).toEqual(expected);
     expect(await rejection(requireUser(await requestWithSession(inactiveAdminId)))).toEqual(expected);
     const forged = new NextRequest("http://localhost:3000/api/protected", {
-      headers: { cookie: "starter_session=forged.token" },
+      headers: { cookie: "terpenos_session=forged.token" },
     });
     expect(await rejection(requireUser(forged))).toEqual(expected);
   });
