@@ -3,10 +3,12 @@
 portal-starter: plantilla para MVPs con auth, cuenta, panel admin (usuarios) y un módulo de ejemplo `Item`.
 Al crear un proyecto desde aquí, cambia la identidad en `packages/shared/src/app-config.ts` (`APP_SLUG`), `apps/web/src/lib/site-config.ts`, `globals.css` y este archivo.
 
-## Specs (reservado)
+## Specs y trabajo automático
 
-La futura skill `create-spect` gestionará `docs/spec.md`, `docs/plan.md`, `docs/task.md` y `docs/decision-log.md`.
-Aún no existe: no crees esos archivos a mano ni otra skill con ese nombre. Mientras tanto, el pedido del usuario manda.
+- La skill `spect-creator-inicio` gestiona `docs/spec.md`, `plan.md`, `task.md` y `decision-log.md`: `/spect-creator-inicio <brief>` escribe el contrato; `/spect-creator-inicio next` implementa la siguiente tarea (una por PR).
+- Al editar esos docs, respeta `references/templates.md` de la skill: `scripts/trace-check.mjs` valida IDs y formatos.
+- En GitHub: `@claude …` en un issue/PR ejecuta `.github/workflows/claude.yml` (Postgres incluido). `ci.yml` valida cada PR.
+- La action lee `.claude/` y `CLAUDE.md` de la rama base: los cambios a la skill solo aplican tras merge a `main`.
 
 ## Arquitectura real (no inventar otra)
 

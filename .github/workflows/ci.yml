@@ -1,0 +1,46 @@
+# Gate for every PR (including the ones Claude opens): lint, typecheck and tests.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm run setup
+      - run: npm ci
+      - run: PGPASSWORD=postgres psql -h localhost -p 5433 -U postgres -c "CREATE DATABASE app_test"
+
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: node --test .claude/skills/spect-creator-inicio/scripts/trace-check.test.mjs
