@@ -123,4 +123,5 @@ jobs:
 
       - name: Report failed gate
         if: failure() && steps.pr.outputs.found == 'true'
-        run: gh pr comment "${{ steps.pr.outputs.number }}" --body "La puerta nocturna falló (lint, typecheck, tests o trace-check). No se hizo merge y el modo noche queda en pausa hasta cerrar o mergear este PR. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          gh pr comment "${{ steps.pr.outputs.number }}" --body "La puerta nocturna falló (lint, typecheck, tests o trace-check). No se hizo merge y el modo noche queda en pausa hasta cerrar o mergear este PR. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
