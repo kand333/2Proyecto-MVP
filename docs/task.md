@@ -16,7 +16,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T004** Contrato shared del catálogo (WS-01 · RF-01,RF-02,RF-03 · M)
   - deps: —
-  - done: dado `packages/shared/src/product.ts` con límites, `PRODUCT_CATEGORIES`, esquemas Zod de producto con variantes (create/update/list público y admin) y `formatClp()`, cuando corren sus tests, entonces rechazan precio ≤ 0 o no entero, stock negativo, 0 o > 20 variantes, SKU duplicado dentro del producto e `imageUrl` no https
+  - done: dado `packages/shared/src/product.ts` con límites, `PRODUCT_CATEGORIES`, esquemas Zod de producto con variantes (create/update/list público y admin) y `formatClp()`, cuando corren sus tests, entonces rechazan precio ≤ 0 o no entero, stock negativo, 0 o > 20 variantes y SKU duplicado dentro del producto
   - verify: `npm test -w @portal/shared && npm run typecheck -w @portal/shared`
 - [ ] **T005** Modelo Prisma Product/ProductVariant y migración (WS-01 · RF-01 · M)
   - deps: T004
@@ -40,7 +40,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T010** Catálogo y ficha públicos (WS-01 · RF-02,RF-03 · L)
   - deps: T007, T001
-  - done: dado `/products` con filtros en la URL y `/products/[slug]` con selector de variante, cuando la variante elegida tiene stock 0, entonces muestra "Agotado" y deshabilita "Añadir al carrito"; las categorías `VAPES` y `E_LIQUIDS` muestran la advertencia sanitaria; la portada enlaza al catálogo
+  - done: dado `/products` con filtros en la URL y `/products/[slug]` con selector de variante, cuando la variante elegida tiene stock 0, entonces muestra "Agotado" y deshabilita "Añadir al carrito"; las categorías `VAPES` y `E_LIQUIDS` muestran la advertencia sanitaria; sin fotos (llegan en T029) se ve un marcador neutro; la portada enlaza al catálogo
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
 - [ ] **T011** Ajustes de tienda: modelo y API (WS-03 · RF-10 · M)
   - deps: —
@@ -111,3 +111,11 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T026
   - done: dado `apps/api/src/lib/csv.ts` con tests de comas, comillas, saltos de línea, BOM y `=cmd`, `GET /api/admin/subscribers/export` con `requireAdmin` (`text/csv; charset=utf-8`, adjunto `subscribers.csv`, `Cache-Control: no-store`) y el enlace «Exportar CSV» en `/admin/subscribers`, cuando un admin lo descarga, entonces recibe cabecera + filas escapadas; sin sesión 401, USER 403
   - verify: `npm test -w @portal/api && npm test -w @portal/web && npm run lint && npm run typecheck`
+- [ ] **T028** Fotos de producto: modelo, Cloudinary y API (WS-01 · RF-21 · L)
+  - deps: T006
+  - done: dado `ProductImage` (url, `publicId` único, posición) migrado, `product-image.ts` en shared (tipos, `MAX_IMAGE_BYTES`, `MAX_PRODUCT_IMAGES = 8`, `detectImageType`), `apps/api/src/lib/cloudinary.ts` y `POST /api/admin/products/[id]/images` + `DELETE …/images/[imageId]` con `requireAdmin`, todo según `docs/recipes/cloudinary.md` adaptado a Product, cuando corren los tests con `fetch` simulado, entonces cubren 201, 400, 413, 415, 404, 409 al superar 8 fotos, 503 sin claves y borrado en Cloudinary antes que en BD. Añade los nombres `CLOUDINARY_*` vacíos a `.env.example` y a los tests de env (DEC-012); los valores no son parte de la tarea
+  - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm test -w @portal/web && npm run typecheck`
+- [ ] **T029** Fotos de producto en la web (WS-01 · RF-21 · M)
+  - deps: T028, T009, T010
+  - done: dado el uploader en `/admin/products/[id]/edit` (`postForm` de `lib/api-client.ts`, errores junto al campo, borrar con `ConfirmDialog`), `lib/image-loader.ts` y el bloque `images` en `apps/web/next.config.ts` (sin tocar `agentRules`), cuando un producto tiene 3 fotos, entonces el catálogo muestra la primera con `next/image` y la ficha las 3 con texto alternativo
+  - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`

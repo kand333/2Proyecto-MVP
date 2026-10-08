@@ -9,7 +9,7 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 
 ## Alcance
 - Dentro: catálogo con variantes y stock, verificación de edad, carrito, checkout como invitado o con cuenta, pago por transferencia confirmado por el admin, envío con tarifa fija o retiro, popup de suscripción con 10 % de descuento en el primer pedido, gestión de pedidos, identidad de la tienda y páginas legales.
-- Fuera: pasarela de pago real (RF-11, la conecta el usuario más adelante), envío de emails, integración con couriers, tarifas por región, verificación documental de identidad, multi-moneda, reseñas, cupones distintos del de bienvenida, subida de imágenes (se usan URLs), exportar Items a CSV (DEC-011).
+- Fuera: pasarela de pago real (RF-11, la conecta el usuario más adelante), envío de emails, integración con couriers, tarifas por región, verificación documental de identidad, multi-moneda, reseñas, cupones distintos del de bienvenida, exportar Items a CSV (DEC-011).
 
 ## Workstreams
 
@@ -44,7 +44,7 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 - Aceptación: dado cualquier página pública, cuando se carga, entonces muestra el nombre de la tienda y enlaces a términos, privacidad, envíos y advertencia sanitaria.
 
 ## Requisitos funcionales
-- **RF-01** (WS-01) Admin crea, edita, publica/despublica y archiva productos con categoría, slug único, descripción, URL de imagen y 1-20 variantes (nombre, SKU único, precio CLP entero > 0, stock ≥ 0, activa). Dado un SKU repetido, cuando guarda, entonces 409.
+- **RF-01** (WS-01) Admin crea, edita, publica/despublica y archiva productos con categoría, slug único, descripción y 1-20 variantes (nombre, SKU único, precio CLP entero > 0, stock ≥ 0, activa). Dado un SKU repetido, cuando guarda, entonces 409.
 - **RF-02** (WS-01) Catálogo público en `/products`: solo productos publicados con ≥ 1 variante activa; filtro por categoría y búsqueda en la URL (`category`, `search`, `page`); 12 por página. Dado `?category=TERPENES`, cuando carga, entonces solo muestra terpenos.
 - **RF-03** (WS-01) Ficha `/products/[slug]` con selector de variante, precio, stock ("Agotado" deshabilita la compra) y la advertencia sanitaria si la categoría contiene nicotina (`VAPES`, `E_LIQUIDS`). Dado un slug inexistente o despublicado, cuando se abre, entonces 404.
 - **RF-04** (WS-02) Aviso de edad al entrar a cualquier página pública: "Soy mayor de 18" lo recuerda en ese navegador; "Soy menor" lleva a `/age-restricted` sin catálogo. Es solo UX; la garantía la dan RF-05 y RF-08.
@@ -63,6 +63,7 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 - **RF-17** (WS-06) Identidad: nombre de la tienda, `APP_SLUG`, metadatos y paleta propia en los tokens de `globals.css`.
 - **RF-18** (WS-06) Páginas `/legal/terms`, `/legal/privacy`, `/legal/shipping` y `/legal/health-warning`, enlazadas en el footer. Contenido inicial con texto marcado "Borrador pendiente de revisión legal".
 - **RF-19** (WS-06) Retirar la capa pública de Item según la receta de `CLAUDE.md`; el módulo admin de Item se conserva (DEC-009).
+- **RF-21** (WS-01) Fotos de producto: el admin sube hasta 8 fotos JPG, PNG o WebP de ≤ 5 MB por producto y puede borrarlas; la primera subida es la portada. El catálogo muestra la portada (o un marcador neutro si no hay) y la ficha, la galería. Dado un archivo que no es imagen por su contenido (aunque se llame `.jpg`), cuando lo sube, entonces 415; > 5 MB → 413; sin claves de Cloudinary configuradas → 503 y el resto de la tienda funciona (DEC-012).
 - **RF-20** (WS-04) Admin descarga desde `/admin/subscribers` un CSV con los suscriptores (`email,code,consentAt,redeemedAt`, más recientes primero, máx. 10 000 filas): RFC 4180, BOM UTF-8 y celdas que empiezan por `=`, `+`, `-`, `@`, tab o CR prefijadas con `'` (DEC-011). Dado un USER, cuando pide el CSV, entonces 403.
 
 ## No funcionales

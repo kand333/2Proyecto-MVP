@@ -24,11 +24,12 @@
 
 ### WS-01 · Catálogo
 - Datos:
-  - `Product`: `id`, `slug @unique`, `name`, `description`, `category ProductCategory`, `imageUrl String?`, `isPublished`, `isArchived`, timestamps; `@@index([isPublished, isArchived, category])`.
+  - `Product`: `id`, `slug @unique`, `name`, `description`, `category ProductCategory`, `isPublished`, `isArchived`, timestamps; `@@index([isPublished, isArchived, category])`.
+  - `ProductImage` (T028): `id`, `productId` (cascade), `url`, `publicId @unique`, `position`; `@@index([productId, position])`.
   - `ProductVariant`: `id`, `productId` (cascade), `name`, `sku @unique`, `priceClp Int`, `stock Int`, `isActive`, `position Int`.
 - API admin: `app/api/admin/products/**` (copia de `admin/items`); PATCH reemplaza variantes por SKU (crea, actualiza, desactiva las que faltan; nunca borra variantes con pedidos).
 - API pública: `app/api/products/route.ts` y `[slug]/route.ts`; el DTO público no incluye `isArchived` ni stock exacto por encima de 10 (`inStock`, `lowStock`).
-- Web: `lib/products.ts` (estado URL con `category`, `search`, `page`, mismos nombres que la API), `lib/public-products-api.ts` (Server Components, patrón `public-items-api.ts`), `components/products/*`, páginas en `app/(site)/products/**` y `app/admin/products/**`. Imágenes con `<img>` (DEC-006). Precio con `formatClp()` (DEC-003).
+- Web: `lib/products.ts` (estado URL con `category`, `search`, `page`, mismos nombres que la API), `lib/public-products-api.ts` (Server Components, patrón `public-items-api.ts`), `components/products/*`, páginas en `app/(site)/products/**` y `app/admin/products/**`. Fotos con `next/image` y loader de Cloudinary (RF-21, DEC-012). Precio con `formatClp()` (DEC-003).
 
 ### WS-03 · Carrito y checkout
 - Datos:
@@ -64,3 +65,4 @@
 1. Revisar y hacer merge de cada PR (o activar el auto-merge nocturno).
 2. Revisión legal y nombre definitivo antes de lanzar.
 3. T024: elegir pasarela y cargar credenciales.
+4. Fotos (T028): crear cuenta en Cloudinary y cargar `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` en `apps/api/.env.local` y en el hosting. Sin ellas, subir fotos responde 503.

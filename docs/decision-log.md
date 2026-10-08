@@ -39,7 +39,7 @@
 - Rollback: tabla `Category` con migración de datos.
 
 ## DEC-006 · Imágenes por URL con `<img>`
-- Fecha: 2026-10-08 · Estado: aprobada
+- Fecha: 2026-10-08 · Estado: reemplazada por DEC-012
 - Problema: `next/image` con dominios remotos obliga a tocar `next.config.ts`, y subir archivos requiere un servicio externo.
 - Elegida: campo `imageUrl` (https, opcional) y `<img loading="lazy">` con dimensiones fijas. Cloudinary (receta en `docs/recipes/`) queda para después.
 - Impacto: WS-01, T005, T009, T010.
@@ -79,3 +79,12 @@
 - Elegida: descartar la exportación de Items y reutilizar sus reglas de CSV (RFC 4180, anti-inyección de fórmulas, BOM, tope de filas) para suscriptores, útil mientras no haya proveedor de email (DEC-010).
 - Impacto: WS-04, RF-20, T027. El issue #1 y su rama se cierran sin merge.
 - Rollback: —
+
+## DEC-012 · Fotos de producto con Cloudinary
+- Fecha: 2026-10-08 · Estado: aprobada
+- Problema: el admin necesita subir fotos; pegar URLs (DEC-006) es frágil.
+- Evidencia: el usuario aprobó usar la receta `docs/recipes/cloudinary.md`; `CLAUDE.md` prohíbe binarios en BD.
+- Elegida: subida firmada desde la API a Cloudinary; la BD guarda `url` y `publicId`. Sin dependencias nuevas.
+- Autorizado de forma explícita para el implementador: añadir los nombres `CLOUDINARY_*` (vacíos) a `.env.example` y a los tests de env, y el bloque `images` en `apps/web/next.config.ts`. Los valores de las claves los carga el usuario; sin ellos, la subida responde 503 y el resto funciona, así que los tests y el modo noche no dependen del secreto.
+- Impacto: WS-01, RF-01, RF-21, T004, T010, T028, T029.
+- Rollback: sección "Reversión" de la receta.
