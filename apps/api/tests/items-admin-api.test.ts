@@ -25,7 +25,7 @@ async function sessionCookieFor(role: "USER" | "ADMIN") {
     data: { name: role, email: `${role.toLowerCase()}-items-${testRunId}@example.com`, passwordHash: "scrypt$not-used-here", role },
   });
   const { createSessionToken } = await import("@/lib/auth/session-token");
-  return `starter_session=${createSessionToken(user.id)}`;
+  return `terpenos_session=${createSessionToken(user.id)}`;
 }
 
 const request = (path: string, method: string, cookie?: string, body?: unknown) =>

@@ -24,7 +24,7 @@ async function createAccount(label: string, role: "USER" | "ADMIN" = "USER", isA
     data: { name: `${label} ${testRunId}`, email: `${label.toLowerCase()}-${testRunId}@example.com`, passwordHash: "scrypt$not-used-here", role, isActive },
   });
   const { createSessionToken } = await import("@/lib/auth/session-token");
-  return { id: user.id, cookie: `starter_session=${createSessionToken(user.id)}` };
+  return { id: user.id, cookie: `terpenos_session=${createSessionToken(user.id)}` };
 }
 
 const request = (path: string, method: string, cookie?: string, body?: unknown) =>
@@ -205,7 +205,7 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("admin users API", () => {
     const { body } = await create({ name: "Editable", email: `editable-${testRunId}@example.com`, password: "clave-original-1" }, admin.cookie);
     const id = (body as AdminUserSummary).id;
     const { createSessionToken } = await import("@/lib/auth/session-token");
-    const openSession = `starter_session=${createSessionToken(id, Date.now() - 60_000)}`;
+    const openSession = `terpenos_session=${createSessionToken(id, Date.now() - 60_000)}`;
     expect(await me(openSession)).toBe(200);
 
     const edited = await update(id, { name: "Editado", email: `editado-${testRunId}@example.com`, password: "clave-nueva-123" }, admin.cookie);

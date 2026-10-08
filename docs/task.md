@@ -2,7 +2,7 @@
 
 Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritorio y 375 px) la hace quien revisa el PR; anótalo en el cuerpo.
 
-- [ ] **T001** Dirección de diseño e identidad (WS-06 · RF-17 · M)
+- [x] **T001** Dirección de diseño e identidad (WS-06 · RF-17 · M)
   - deps: —
   - done: dado `docs/design.md` escrito con `design-taste-frontend` como directora (Design Read de comercio regulado 18+, diales, paleta, tipografía, pantallas clave de portada, catálogo, ficha, carrito y checkout, movimiento solo CSS y lista de rechazo) y aplicado con `frontend-design` en los tokens claro y oscuro de `globals.css`, la fuente de `app/layout.tsx` (`next/font`), `APP_SLUG` y `site-config.ts` con "Terpenos & Vapes", cuando se renderiza el header, entonces muestra el nombre, y `docs/design.md` anota los ratios de contraste AA de texto/fondo y `on-accent`/`accent` en ambos modos
   - verify: `npm test && npm run lint && npm run typecheck`
