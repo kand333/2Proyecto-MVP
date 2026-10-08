@@ -1,6 +1,7 @@
 # Night mode: every hour from 00:00 to 07:00 Chile summer time (03:00-10:00 UTC; one hour earlier in winter),
 # Claude implements the next task of docs/task.md, opens a PR labelled `night`, and this workflow merges it
-# only if lint, typecheck, tests and trace-check pass on that branch.
+# only if lint, typecheck, tests and trace-check pass on that branch. After a merge it dispatches itself again,
+# so the queue keeps moving until it is empty or a gate fails; the hourly cron is the fallback.
 # Stops by itself while a `night` PR is open (failed gate or human-blocked task): review it in the morning.
 # Off switch: repository variable NIGHT_MODE=off (Settings → Secrets and variables → Actions → Variables),
 # or disable the workflow in the Actions tab. Manual run: Actions → Claude night → Run workflow.
@@ -21,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 55
     permissions:
+      actions: write
       contents: write
       pull-requests: write
       issues: write
@@ -120,6 +122,11 @@ jobs:
       - name: Merge
         if: steps.gate.outcome == 'success'
         run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+
+      # GITHUB_TOKEN may trigger workflow_dispatch (the one event GitHub allows it to start).
+      - name: Continue with the next task
+        if: steps.gate.outcome == 'success'
+        run: gh workflow run claude-night.yml --ref main
 
       - name: Report failed gate
         if: failure() && steps.pr.outputs.found == 'true'
