@@ -76,11 +76,15 @@ async function main() {
   const text = prompt(cloudBranch, next.id);
   if (dryRun) return log(`would launch ${cloudBranch} from ${next.id} (${progress.done}/${progress.total} done)\n${text}`);
 
+  if (!process.stdout.isTTY) return log("claude --cloud needs an interactive terminal: run this from a console window (the scheduled task opens one)");
+
   // No shell: the multi-line prompt goes as a single argv entry (claude is a native executable).
-  // The timeout only guards a hung CLI; the session itself keeps running in the cloud.
-  const result = spawnSync("claude", ["--cloud", text], { cwd: root, encoding: "utf8", timeout: 10 * 60 * 1000 });
+  // stdio inherit: --cloud refuses to run without a TTY. The timeout only guards a hung CLI;
+  // the session itself keeps running in the cloud.
+  log(`launching ${cloudBranch} from ${next.id}`);
+  const result = spawnSync("claude", ["--cloud", text], { cwd: root, stdio: "inherit", timeout: 10 * 60 * 1000 });
   if (result.error) return log(`could not run claude: ${result.error.message}`);
-  log(`claude --cloud exit ${result.status}\n${(result.stdout ?? "").trim()}\n${(result.stderr ?? "").trim()}`);
+  log(`claude --cloud exit ${result.status ?? `signal ${result.signal}`}`);
   if (result.status === 0) writeFileSync(stamp, cloudBranch);
 }
 
