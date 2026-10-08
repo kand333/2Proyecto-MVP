@@ -43,7 +43,18 @@ Conflicto entre fuentes: no lo resuelvas en silencio. Pregunta (o `[PENDIENTE]`)
 3. **Escribe** con `references/templates.md`:
    - `pequeño`: `spec.md` + `task.md` (+ `decision-log.md` si hubo DEC).
    - `normal`: los cuatro.
-   - Si ya existen: edita en sitio, añade IDs nuevos al final, nunca borres ni desmarques tareas `[x]`.
+   - Si ya existen, el brief es un **incremento**, no un contrato nuevo (ver abajo).
+
+### Incremento sobre docs existentes
+Un solo contrato vivo por repo: dos `spec.md` paralelos chocan en git y obligan al implementador a adivinar cuál manda.
+- Lee los cuatro docs completos antes de escribir. Edita en sitio; nunca crees `spec-2.md` ni reescribas desde cero.
+- Lo que el brief ya cubre: actualiza ese RF o tarea en vez de duplicarlo. Lo nuevo: IDs a continuación del mayor existente, en el WS que encaje o en uno nuevo.
+- Lo que el brief vuelve innecesario:
+  - pendiente (`[ ]`): bórralo junto con sus tareas y referencias;
+  - ya hecho (`[x]`): no lo borres (es historia del código); añade "reemplazado por RF-XX".
+  - En ambos casos registra una DEC con qué se quitó y por qué.
+- Poda la repetición: cada dato vive en un solo sitio (spec = qué, plan = cómo, task = pasos y verificación, decision-log = por qué). Si plan repite un criterio de spec, deja la referencia (`RF-04`), no el texto.
+- Contratos de otras ramas o PRs sin merge que tocan `docs/`: léelos, integra solo lo que siga siendo necesario y di en la respuesta qué PR o rama hay que cerrar.
 4. **Valida**: corre `trace-check`; corrige todo `ERROR`. En `normal`, luego `references/redteam.md`. Máximo 2 vueltas.
 5. **Cierra**: fija `> Estado:` en spec.md:
    - `SHIP`: trace-check OK y ningún `[PENDIENTE]` bloqueante.
@@ -58,10 +69,11 @@ Respuesta final (≤ 10 líneas): estado, nº de WS/RF/tareas, primera tarea, su
    - `FAIL` o estado ≠ `SHIP` → no implementes; explica qué falta y sugiere `/spect-creator-inicio` para cerrarlo.
    - `NEXT: none` → informa progreso (`tasks: x/y`) y para.
 2. Lee la tarea, sus RF en spec.md, su WS en plan.md y las DEC citadas. Lee solo el código que vas a tocar.
-3. Implementa siguiendo `CLAUDE.md` (capas, convenciones, tests). Toda funcionalidad nueva lleva test.
-4. Corre el `verify` de la tarea y la verificación mínima que exija `CLAUDE.md` para ese tipo de cambio. Si falla, arregla; no marques `[x]` con verificación roja.
-5. Actualiza `docs/task.md`: `[x]`. Decisión estructural tomada → nueva DEC.
-6. Una tarea por ejecución. Encadenar varias produce PRs imposibles de revisar.
+3. **Contrasta el contrato con el código** antes de escribir: rutas, nombres de funciones, campos y comandos citados deben existir (o ser lo que esta tarea crea). Si el doc está desfasado, corrígelo en el mismo PR con el cambio mínimo y dilo en el cuerpo del PR; si la corrección cambia alcance o estructura, para y pregunta (o `[PENDIENTE]`).
+4. Implementa siguiendo `CLAUDE.md` (capas, convenciones, tests). Toda funcionalidad nueva lleva test. Implementa exactamente el `done`: ni menos, ni extras de otras tareas.
+5. Corre el `verify` de la tarea y la verificación mínima que exija `CLAUDE.md` para ese tipo de cambio. Si falla, arregla; no marques `[x]` con verificación roja.
+6. Actualiza `docs/task.md`: `[x]`. Decisión estructural tomada → nueva DEC. Si lo implementado cambia lo que asume una tarea posterior (nombre, ruta, firma), ajusta esa tarea ahora para que el próximo `next` no parta de un dato falso.
+7. Una tarea por ejecución. Encadenar varias produce PRs imposibles de revisar.
 
 **Para y pide ayuda humana** (sin usuario: explícalo en la respuesta y deja la tarea sin marcar) si la tarea requiere: secretos o variables nuevas, despliegue o datos de producción, una dependencia no aprobada, o contradice `CLAUDE.md`.
 

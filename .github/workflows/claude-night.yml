@@ -1,0 +1,126 @@
+# Night mode: every hour from 00:00 to 07:00 Chile summer time (03:00-10:00 UTC; one hour earlier in winter),
+# Claude implements the next task of docs/task.md, opens a PR labelled `night`, and this workflow merges it
+# only if lint, typecheck, tests and trace-check pass on that branch.
+# Stops by itself while a `night` PR is open (failed gate or human-blocked task): review it in the morning.
+# Off switch: repository variable NIGHT_MODE=off (Settings → Secrets and variables → Actions → Variables),
+# or disable the workflow in the Actions tab. Manual run: Actions → Claude night → Run workflow.
+name: Claude night
+
+on:
+  schedule:
+    - cron: "0 3-10 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: claude-night
+  cancel-in-progress: false
+
+jobs:
+  next-task:
+    if: vars.NIGHT_MODE != 'off'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decide whether to run
+        id: guard
+        run: |
+          open=$(gh pr list --label night --state open --json number --jq 'length')
+          if [ "$open" != "0" ]; then
+            echo "A night PR is still open: waiting for a human."; echo "run=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          next=$(node .claude/skills/spect-creator-inicio/scripts/trace-check.mjs docs --next | grep '^NEXT:' || true)
+          echo "$next"
+          case "$next" in
+            "NEXT: T"*) echo "run=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "run=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - uses: actions/setup-node@v4
+        if: steps.guard.outputs.run == 'true'
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Prepare environment
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          npm run setup
+          npm ci
+          PGPASSWORD=postgres psql -h localhost -p 5433 -U postgres -c "CREATE DATABASE app_test"
+          gh label create night --color 5319e7 --description "Opened by Claude night mode" --force
+
+      - name: Implement next task
+        if: steps.guard.outputs.run == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            /spect-creator-inicio next
+
+            Ejecución nocturna sin usuario (run ${{ github.run_id }}). Además de la skill:
+            1. Crea la rama `night/<TaskID>-${{ github.run_id }}` desde main antes de editar.
+            2. Commits pequeños en inglés y `git push -u origin night/<TaskID>-${{ github.run_id }}`.
+            3. Abre el PR con `gh pr create --base main --label night --title "<TaskID> · <título>"` y un cuerpo con qué cambia, el `verify` ejecutado y su resultado.
+            4. No hagas merge: este workflow lo hace solo si lint, typecheck y tests pasan.
+            5. Si la tarea necesita a un humano o no logras dejarla en verde, abre el PR igualmente con `--draft` y explica el bloqueo en el cuerpo.
+          claude_args: |
+            --allowedTools "Edit,Write,MultiEdit,Bash(git checkout *),Bash(git switch *),Bash(git add *),Bash(git commit *),Bash(git push -u origin night/*),Bash(git status *),Bash(git diff *),Bash(git log *),Bash(gh pr create *),Bash(npm test *),Bash(npm run test *),Bash(npm run lint *),Bash(npm run typecheck *),Bash(npm run build *),Bash(npm run db:migrate *),Bash(npm run db:generate *),Bash(npm run db:seed *),Bash(npx vitest *),Bash(node .claude/skills/spect-creator-inicio/scripts/*),Bash(node --test *)"
+
+      - name: Find the night PR
+        if: steps.guard.outputs.run == 'true'
+        id: pr
+        run: |
+          pr=$(gh pr list --label night --state open --json number,headRefName,isDraft --jq '.[0] // empty')
+          if [ -z "$pr" ]; then echo "Claude opened no PR."; echo "found=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "number=$(echo "$pr" | jq -r .number)" >> "$GITHUB_OUTPUT"
+          echo "branch=$(echo "$pr" | jq -r .headRefName)" >> "$GITHUB_OUTPUT"
+          echo "draft=$(echo "$pr" | jq -r .isDraft)" >> "$GITHUB_OUTPUT"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      # Independent gate on exactly what was pushed: the merge never depends on Claude's own report.
+      - name: Gate (lint, typecheck, tests, trace-check)
+        if: steps.pr.outputs.found == 'true' && steps.pr.outputs.draft == 'false'
+        id: gate
+        run: |
+          git fetch origin "${{ steps.pr.outputs.branch }}"
+          git checkout --force --detach FETCH_HEAD
+          npm ci
+          npm run lint
+          npm run typecheck
+          npm test
+          node .claude/skills/spect-creator-inicio/scripts/trace-check.mjs docs
+
+      - name: Merge
+        if: steps.gate.outcome == 'success'
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+
+      - name: Report failed gate
+        if: failure() && steps.pr.outputs.found == 'true'
+        run: gh pr comment "${{ steps.pr.outputs.number }}" --body "La puerta nocturna falló (lint, typecheck, tests o trace-check). No se hizo merge y el modo noche queda en pausa hasta cerrar o mergear este PR. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

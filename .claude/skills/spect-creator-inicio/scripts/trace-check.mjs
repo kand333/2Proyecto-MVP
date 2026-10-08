@@ -130,6 +130,20 @@ export function check(docsDir) {
     if (t.size === "XL") warn("task.md", t.line, `${t.id} is XL: split it so it fits one session/PR`);
   }
 
+  // Repetition: same requirement or same task written twice under different IDs.
+  const normalize = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const seen = new Map();
+  const dupe = (file, line, key, id) => {
+    if (!key) return;
+    if (seen.has(key)) warn(file, line, `${id} repeats ${seen.get(key)}: merge them`);
+    else seen.set(key, id);
+  };
+  spec.forEach((text, i) => {
+    const r = text.match(RF_DEF);
+    if (r) dupe("spec.md", i + 1, `rf:${normalize(text.slice(r[0].length))}`, r[1]);
+  });
+  for (const t of taskMap.values()) dupe("task.md", t.line, `task:${normalize(t.title)}`, t.id);
+
   // RF without task
   for (const [id, r] of rf) {
     if (![...taskMap.values()].some((t) => t.rf.includes(id))) err("spec.md", r.line, `${id} has no task`);

@@ -96,6 +96,14 @@ test("[PENDIENTE] tasks are skipped by next", () => {
   assert.equal(r.next, null);
 });
 
+test("repeated requirements and tasks only warn", () => {
+  const spec = SPEC.replace("- **RF-02** (WS-01) Crear producto (ver DEC-001).", "- **RF-02** (WS-01) Listar productos. Dado un visitante, cuando abre /products, entonces ve 20 por página.");
+  const tasks = TASKS.replace("Listado público", "Endpoint admin");
+  const r = check(fixture({ ...base, "spec.md": spec, "task.md": tasks }));
+  assert.ok(r.warnings.some((w) => w.includes("RF-02 repeats RF-01")));
+  assert.ok(r.warnings.some((w) => w.includes("T003 repeats T002")));
+});
+
 test("XL tasks only warn", () => {
   const r = check(fixture({ ...base, "task.md": TASKS.replace("RF-01 · M)", "RF-01 · XL)") }));
   assert.deepEqual(r.errors, []);
