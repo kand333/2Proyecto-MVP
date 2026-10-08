@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Components use only these roles (bg-paper, text-ink, border-line, bg-accent…),
+ * never raw palette colors, so a project changes its look here. Dark mode keeps the same roles.
+ * Neutral defaults: replace the values (and the font in app/layout.tsx) for each project.
+ */
+:root {
+  --paper: #fafafa;
+  --surface: #ffffff;
+  --ink: #18181b;
+  --muted: #52525b;
+  --line: #e4e4e7;
+  --accent: #18181b;
+  --accent-hover: #3f3f46;
+  --on-accent: #fafafa;
+  --shadow-ink: 24 24 27;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f1012;
+    --surface: #18181b;
+    --ink: #f4f4f5;
+    --muted: #a1a1aa;
+    --line: #2e2e33;
+    --accent: #f4f4f5;
+    --accent-hover: #d4d4d8;
+    --on-accent: #18181b;
+    --shadow-ink: 0 0 0;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --font-sans: var(--font-sans-family);
+  /* Titles and figures. Same family by default; point it to a second font if the project needs one. */
+  --font-display: var(--font-sans-family);
+  --shadow-soft: 0 1px 2px rgb(var(--shadow-ink) / 0.05), 0 14px 32px -14px rgb(var(--shadow-ink) / 0.14);
+  --shadow-lift: 0 2px 4px rgb(var(--shadow-ink) / 0.06), 0 30px 60px -22px rgb(var(--shadow-ink) / 0.32);
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a,
+  button,
+  select,
+  input,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* One visible focus style for the whole site; components only opt out when they draw their own. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+}
+
+/* Flash messages drop in from the top. */
+@keyframes flash-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

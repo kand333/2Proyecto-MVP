@@ -1,0 +1,32 @@
+{
+  "name": "portal-starter",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "dev": "concurrently --kill-others-on-fail --names api,web --prefix-colors blue,green \"npm run dev -w @portal/api\" \"npm run dev -w @portal/web\"",
+    "dev:api": "npm run dev -w @portal/api",
+    "dev:web": "npm run dev -w @portal/web",
+    "build": "npm run build -w @portal/api && npm run build -w @portal/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:generate": "npm run db:generate -w @portal/api",
+    "db:migrate": "npm run db:migrate -w @portal/api",
+    "db:deploy": "npm run db:deploy -w @portal/api",
+    "db:status": "npm run db:status -w @portal/api",
+    "db:seed": "npm run db:seed -w @portal/api"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

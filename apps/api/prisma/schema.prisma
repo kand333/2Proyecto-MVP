@@ -1,0 +1,48 @@
+// Prisma schema. The connection URL is configured in prisma.config.ts.
+// CHECK constraints are not expressible here: they live in the migration SQL.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  // Stored normalized (trimmed, lowercase) by the service layer.
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(USER)
+  isActive     Boolean  @default(true)
+  // Sessions issued before this instant are rejected: set when the password changes (logs out other devices).
+  sessionsValidAfter DateTime?
+  // Last authenticated request (refreshed at most once a minute): "online" and "last connection" in the admin list.
+  lastSeenAt   DateTime?
+  // Logout time: offline at once while keeping lastSeenAt (online only when lastSeenAt is later).
+  loggedOutAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Example module: copy it (shared schema → repository → service → routes → tests → pages) for each
+// new entity of a project, then delete it.
+model Item {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  title       String
+  description String
+  // Only published items reach the public pages.
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, createdAt])
+}
