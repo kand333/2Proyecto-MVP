@@ -44,3 +44,4 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: node --test .claude/skills/spect-creator-inicio/scripts/trace-check.test.mjs
+      - run: node .claude/skills/spect-creator-inicio/scripts/trace-check.mjs docs

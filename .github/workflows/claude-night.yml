@@ -53,6 +53,10 @@ jobs:
       - name: Decide whether to run
         id: guard
         run: |
+          # Until the cloud session credits expire, scripts/cloud-night.mjs does the nightly work instead.
+          if [ "$(date -u +%s)" -lt "$(date -u -d 2026-11-05T08:00:00Z +%s)" ]; then
+            echo "Cloud session credits active until 2026-11-05: cloud-night launcher handles the queue."; echo "run=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
           open=$(gh pr list --label night --state open --json number --jq 'length')
           if [ "$open" != "0" ]; then
             echo "A night PR is still open: waiting for a human."; echo "run=false" >> "$GITHUB_OUTPUT"; exit 0

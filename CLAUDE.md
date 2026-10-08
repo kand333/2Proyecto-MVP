@@ -9,6 +9,7 @@ Al crear un proyecto desde aquí, cambia la identidad en `packages/shared/src/ap
 - Al editar esos docs, respeta `references/templates.md` de la skill: `scripts/trace-check.mjs` valida IDs y formatos.
 - En GitHub: `@claude …` en un issue/PR ejecuta `.github/workflows/claude.yml` (Postgres incluido). `ci.yml` valida cada PR.
 - La action lee `.claude/` y `CLAUDE.md` de la rama base: los cambios a la skill solo aplican tras merge a `main`.
+- Hasta el 2026-11-05 (créditos de cloud sessions): la tarea programada de Windows «Claude cloud night» ejecuta `scripts/cloud-night.mjs` a las 23:30, que lanza `claude --cloud` con un bloque de 4 tareas en `cloud/AAAAMMDD`; `cloud-merge.yml` lo integra en `main` si la puerta pasa. Una rama `cloud/*` sin integrar pausa el lanzador. `claude-night.yml` queda en pausa hasta esa fecha.
 - Modo noche (`claude-night.yml`): cada hora de 00:00 a 07:00 (Chile) implementa la siguiente tarea en una rama `night/*` y hace merge solo si lint, typecheck, tests y `trace-check` pasan. Un PR `night` abierto lo pausa. Apagado: variable de repo `NIGHT_MODE=off`.
 
 ## Arquitectura real (no inventar otra)

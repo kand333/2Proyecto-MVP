@@ -1,0 +1,99 @@
+# Gate and merge for blocks pushed by the nightly cloud session (scripts/cloud-night.mjs).
+# A push to cloud/** runs lint, typecheck, tests and trace-check on that branch; if green it squashes the branch
+# into main and deletes it (no PR: GITHUB_TOKEN may not open PRs by default). On failure the branch stays,
+# which pauses the launcher until it is reviewed or deleted.
+name: Cloud merge
+
+on:
+  push:
+    branches: ["cloud/**"]
+
+concurrency:
+  group: cloud-merge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate-and-merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: ${{ github.ref_name }}
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Gate (lint, typecheck, tests, trace-check)
+        id: gate
+        run: |
+          npm run setup
+          npm ci
+          PGPASSWORD=postgres psql -h localhost -p 5433 -U postgres -c "CREATE DATABASE app_test"
+          npm run lint
+          npm run typecheck
+          npm test
+          node .claude/skills/spect-creator-inicio/scripts/trace-check.mjs docs
+
+      - name: Squash into main
+        id: merge
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git log --format='- %s' origin/main..HEAD > block-commits.txt
+          git checkout -B main origin/main
+          git merge --squash "origin/$BRANCH"
+          { echo "feat: cloud block $BRANCH"; echo; cat block-commits.txt; } > squash-message.txt
+          git commit -F squash-message.txt
+          git push origin main
+          git push origin --delete "$BRANCH"
+
+      - name: Night log
+        if: always()
+        env:
+          GATE: ${{ steps.gate.outcome }}
+          MERGE: ${{ steps.merge.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create night-log --color 999999 --description "Claude night mode log" --force
+          issue=$(gh issue list --label night-log --state open --json number --jq '.[0].number // empty')
+          if [ -z "$issue" ]; then
+            issue=$(gh issue create --title "Modo noche: bitácora" --label night-log --body "Una entrada por ejecución del modo noche." | grep -o '[0-9]*$')
+          fi
+          {
+            echo "### Cloud: $BRANCH"
+            echo "- Run: $RUN_URL"
+            echo "- Puerta: $GATE · Integrado en main: ${MERGE:-no}"
+            echo
+            echo "Commits del bloque:"
+            cat block-commits.txt 2>/dev/null || git log --format='- %s' origin/main.."origin/$BRANCH" 2>/dev/null || true
+            if [ "$GATE" != "success" ]; then
+              echo
+              echo "La rama queda sin integrar y el lanzador nocturno se pausa hasta que se revise o se borre."
+            fi
+          } > night-log.md
+          gh issue comment "$issue" --body-file night-log.md
