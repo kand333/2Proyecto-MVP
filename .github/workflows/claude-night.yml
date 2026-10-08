@@ -59,6 +59,7 @@ jobs:
           fi
           next=$(node .claude/skills/spect-creator-inicio/scripts/trace-check.mjs docs --next | grep '^NEXT:' || true)
           echo "$next"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
           case "$next" in
             "NEXT: T"*) echo "run=true" >> "$GITHUB_OUTPUT" ;;
             *) echo "run=false" >> "$GITHUB_OUTPUT" ;;
@@ -80,11 +81,12 @@ jobs:
 
       - name: Implement next task
         if: steps.guard.outputs.run == 'true'
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
-            /spect-creator-inicio next
+            Lee `.claude/skills/spect-creator-inicio/SKILL.md` y ejecuta su "Modo next" completo (equivale a `/spect-creator-inicio next`) sobre la tarea: ${{ steps.guard.outputs.next }}.
 
             Ejecución nocturna sin usuario (run ${{ github.run_id }}). Además de la skill:
             1. Crea la rama `night/<TaskID>-${{ github.run_id }}` desde main antes de editar.
@@ -92,8 +94,10 @@ jobs:
             3. Abre el PR con `gh pr create --base main --label night --title "<TaskID> · <título>"` y un cuerpo con qué cambia, el `verify` ejecutado y su resultado.
             4. No hagas merge: este workflow lo hace solo si lint, typecheck y tests pasan.
             5. Si la tarea necesita a un humano o no logras dejarla en verde, abre el PR igualmente con `--draft` y explica el bloqueo en el cuerpo.
+          # Scheduled (agent) mode grants nothing by default: reading, editing and skills must be allowed explicitly.
           claude_args: |
-            --allowedTools "WebFetch(domain:raw.githubusercontent.com),Edit,Write,MultiEdit,Bash(git checkout *),Bash(git switch *),Bash(git add *),Bash(git commit *),Bash(git push -u origin night/*),Bash(git status *),Bash(git diff *),Bash(git log *),Bash(gh pr create *),Bash(npm test *),Bash(npm run test *),Bash(npm run lint *),Bash(npm run typecheck *),Bash(npm run build *),Bash(npm run db:migrate *),Bash(npm run db:generate *),Bash(npm run db:seed *),Bash(npx vitest *),Bash(node .claude/skills/spect-creator-inicio/scripts/*),Bash(node --test *)"
+            --permission-mode acceptEdits
+            --allowedTools "Read,Glob,Grep,Skill,TodoWrite,WebFetch(domain:raw.githubusercontent.com),Edit,Write,MultiEdit,Bash(git checkout *),Bash(git switch *),Bash(git add *),Bash(git commit *),Bash(git push -u origin night/*),Bash(git status *),Bash(git diff *),Bash(git log *),Bash(gh pr create *),Bash(npm test *),Bash(npm run test *),Bash(npm run lint *),Bash(npm run typecheck *),Bash(npm run build *),Bash(npm run db:migrate *),Bash(npm run db:generate *),Bash(npm run db:seed *),Bash(npx vitest *),Bash(node .claude/skills/spect-creator-inicio/scripts/*),Bash(node --test *)"
 
       - name: Find the night PR
         if: steps.guard.outputs.run == 'true'
@@ -132,3 +136,33 @@ jobs:
         if: failure() && steps.pr.outputs.found == 'true'
         run: |
           gh pr comment "${{ steps.pr.outputs.number }}" --body "La puerta nocturna falló (lint, typecheck, tests o trace-check). No se hizo merge y el modo noche queda en pausa hasta cerrar o mergear este PR. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      # Public log of every run in one issue, readable without admin rights (job logs are not).
+      - name: Night log
+        if: always() && steps.guard.outputs.run == 'true'
+        env:
+          EXECUTION_FILE: ${{ steps.claude.outputs.execution_file }}
+          NEXT_TASK: ${{ steps.guard.outputs.next }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          GATE: ${{ steps.gate.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create night-log --color 999999 --description "Claude night mode log" --force
+          issue=$(gh issue list --label night-log --state open --json number --jq '.[0].number // empty')
+          if [ -z "$issue" ]; then
+            issue=$(gh issue create --title "Modo noche: bitácora" --label night-log --body "Una entrada por ejecución del modo noche." | grep -o '[0-9]*$')
+          fi
+          {
+            echo "### $NEXT_TASK"
+            echo "- Run: $RUN_URL"
+            echo "- PR: ${PR_NUMBER:-ninguno} · Puerta: ${GATE:-no ejecutada}"
+            echo
+            if [ -n "$EXECUTION_FILE" ] && [ -f "$EXECUTION_FILE" ]; then
+              jq -r '[.[] | select(.type == "result")] | last | "subtype: \(.subtype) · error: \(.is_error) · turnos: \(.num_turns)"' "$EXECUTION_FILE"
+              echo
+              jq -r '[.[] | select(.type == "result")] | last | .result // ""' "$EXECUTION_FILE" | head -c 6000
+            else
+              echo "(sin archivo de ejecución)"
+            fi
+          } > night-log.md
+          gh issue comment "$issue" --body-file night-log.md
