@@ -35,6 +35,47 @@ model User {
   updatedAt    DateTime @updatedAt
 }
 
+// Must match PRODUCT_CATEGORIES in @portal/shared/product (DEC-005).
+enum ProductCategory {
+  TERPENES
+  VAPES
+  E_LIQUIDS
+  ACCESSORIES
+}
+
+model Product {
+  id          String          @id @default(uuid(7)) @db.Uuid
+  slug        String          @unique
+  name        String
+  description String
+  category    ProductCategory
+  // Only published, non-archived products with an active variant reach the public catalog.
+  isPublished Boolean         @default(false)
+  // Archiving replaces deletion: orders keep pointing at its variants.
+  isArchived  Boolean         @default(false)
+  variants    ProductVariant[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([isPublished, isArchived, category])
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  // Stored trimmed and uppercase by the shared schema.
+  sku       String  @unique
+  // Whole CLP (DEC-003). CHECK priceClp > 0 and stock >= 0 live in the migration SQL.
+  priceClp  Int
+  stock     Int
+  isActive  Boolean @default(true)
+  position  Int
+
+  @@index([productId, position])
+}
+
 // Example module: copy it (shared schema → repository → service → routes → tests → pages) for each
 // new entity of a project, then delete it.
 model Item {

@@ -22,7 +22,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: —
   - done: dado `packages/shared/src/product.ts` con límites, `PRODUCT_CATEGORIES`, esquemas Zod de producto con variantes (create/update/list público y admin) y `formatClp()`, cuando corren sus tests, entonces rechazan precio ≤ 0 o no entero, stock negativo, 0 o > 20 variantes y SKU duplicado dentro del producto
   - verify: `npm test -w @portal/shared && npm run typecheck -w @portal/shared`
-- [ ] **T005** Modelo Prisma Product/ProductVariant y migración (WS-01 · RF-01 · M)
+- [x] **T005** Modelo Prisma Product/ProductVariant y migración (WS-01 · RF-01 · M)
   - deps: T004
   - done: dado `Product` (slug único, categoría enum, publicado, archivado) y `ProductVariant` (SKU único, precio Int, stock Int, activa) migrados con `add_catalog`, cuando corre `shared-contract.test.ts`, entonces `PRODUCT_CATEGORIES` coincide con el enum de Prisma
   - verify: `npm test -w @portal/api && npm run typecheck`
