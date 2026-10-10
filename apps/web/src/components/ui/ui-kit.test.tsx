@@ -1,14 +1,17 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { MagnifyingGlass } from "@phosphor-icons/react/ssr";
+import { ArrowRight, MagnifyingGlass, ShoppingBag } from "@phosphor-icons/react/ssr";
+import Link from "next/link";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Badge } from "./badge";
 import { Button, buttonClassName } from "./button";
 import { EmptyState } from "./empty-state";
 import { Field, Input, Select } from "./field";
+import { IconButton, IconCount, iconButtonClassName } from "./icon-button";
 import { Price } from "./price";
 import { ProductCard, ProductCardSkeleton } from "./product-card";
+import { ProductCarousel } from "./product-carousel";
 import { Skeleton } from "./skeleton";
 
 const uiDirectory = join(process.cwd(), "src/components/ui");
@@ -28,6 +31,10 @@ describe("components/ui", () => {
   it.each(uiSources)("$file draws no icon by hand and never hides the focus outline", ({ source }) => {
     expect(source).not.toContain("<svg");
     expect(source).not.toMatch(/outline-none|outline-0/);
+  });
+
+  it.each(uiSources)("$file never types an arrow or a dash as decoration", ({ source }) => {
+    expect(source).not.toMatch(/[→—–]/);
   });
 });
 
@@ -62,9 +69,15 @@ describe("Button", () => {
 
   it("offers each variant and the classes for links that look like buttons", () => {
     expect(renderToStaticMarkup(<Button variant="danger">Eliminar</Button>)).toContain("bg-red-700");
-    expect(renderToStaticMarkup(<Button variant="secondary">Cancelar</Button>)).toContain("border-line");
+    expect(renderToStaticMarkup(<Button variant="secondary">Cancelar</Button>)).toContain("border-ink");
     expect(buttonClassName("ghost", "sm")).toContain("h-9");
-    expect(buttonClassName()).toContain("rounded-lg");
+    expect(buttonClassName()).toContain("rounded-sm");
+  });
+
+  it("adds a decorative icon after the label, hidden while loading", () => {
+    const html = renderToStaticMarkup(<Button iconEnd={<ArrowRight />}>Explorar</Button>);
+    expect(html).toMatch(/Explorar<span aria-hidden="true"[^>]*><svg/);
+    expect(renderToStaticMarkup(<Button loading iconEnd={<ArrowRight />}>Explorar</Button>).match(/<svg/g)).toHaveLength(1);
   });
 });
 
@@ -92,6 +105,38 @@ describe("Field", () => {
   });
 });
 
+describe("IconButton", () => {
+  it("is a 44 px non-submitting button named by its label", () => {
+    const html = renderToStaticMarkup(<IconButton label="Buscar" icon={<MagnifyingGlass />} />);
+    expect(html).toMatch(/^<button type="button" aria-label="Buscar"/);
+    expect(html).toContain("size-11");
+    expect(html).toMatch(/<svg/);
+  });
+
+  it("offers the classes for links and a decorative count", () => {
+    const html = renderToStaticMarkup(
+      <a href="/cart" aria-label="Carrito, 3 unidades" className={iconButtonClassName()}>
+        <ShoppingBag aria-hidden="true" />
+        <IconCount count={3} />
+      </a>,
+    );
+    expect(html).toContain("size-11");
+    expect(html).toMatch(/<span aria-hidden="true"[^>]*>3<\/span>/);
+    expect(renderToStaticMarkup(<IconCount count={120} />)).toContain(">99+</span>");
+  });
+});
+
+describe("Input underline", () => {
+  it("draws only a bottom rule and keeps the field accessible", () => {
+    const html = renderToStaticMarkup(
+      <Field id="subscribe-email" label="Email">{(control) => <Input variant="underline" type="email" {...control} />}</Field>,
+    );
+    expect(html).toContain("border-b border-ink");
+    expect(html).not.toContain("rounded-sm border border-line");
+    expect(html).toContain("<label for=\"subscribe-email\"");
+  });
+});
+
 describe("Select", () => {
   it("is a native select with explicit colors and a decorative caret", () => {
     const html = renderToStaticMarkup(
@@ -116,6 +161,17 @@ describe("Badge and Price", () => {
     expect(html).toContain(">Agotado</span>");
   });
 
+  it("renders the offer and sold-out pills as solid tokens", () => {
+    expect(renderToStaticMarkup(<Badge tone="offer">Oferta</Badge>)).toContain("bg-highlight text-on-highlight");
+    expect(renderToStaticMarkup(<Badge tone="soldOut">Agotado</Badge>)).toContain("bg-ink text-paper");
+  });
+
+  it("strikes the previous price through, announced as such", () => {
+    const html = renderToStaticMarkup(<Price amountClp={9990} compareAtClp={12990} />);
+    expect(html).toContain("<s class=\"ml-2 font-normal text-muted\"><span class=\"sr-only\">Precio anterior </span>$12.990</s>");
+    expect(renderToStaticMarkup(<Price amountClp={9990} compareAtClp={null} />)).not.toContain("<s ");
+  });
+
   it("formats CLP with tabular figures and an optional «Desde»", () => {
     expect(renderToStaticMarkup(<Price amountClp={12990} />)).toBe(
       '<span class="tabular-nums"><data value="12990">$12.990</data></span>',
@@ -125,26 +181,46 @@ describe("Badge and Price", () => {
 });
 
 describe("ProductCard", () => {
-  const product = { slug: "terpeno-limon", name: "Terpeno limón", category: "TERPENES" as const, priceFromClp: 12990, inStock: true };
+  const product = { slug: "terpeno-limon", name: "Terpeno limón", category: "TERPENES" as const, priceFromClp: 12990, compareAtFromClp: null, inStock: true, coverUrl: null };
 
-  it("links to the product page, named by the product, with category and price", () => {
+  it("links to the product page with a 1:1 photo, the name in accent and the price", () => {
     const html = renderToStaticMarkup(<ProductCard product={product} />);
     expect(html).toContain('href="/products/terpeno-limon"');
-    expect(html).toContain(">Terpeno limón</h3>");
-    expect(html).toContain(">Terpenos</p>");
+    expect(html).toMatch(/<h3 class="[^"]*text-accent[^"]*">Terpeno limón<\/h3>/);
     expect(html).toContain("$12.990");
-    expect(html).toContain("aspect-[4/5]");
+    expect(html).toContain("aspect-square");
     expect(html).not.toContain("Agotado");
+    expect(html).not.toContain("Oferta");
   });
 
-  it("marks a product without stock as sold out", () => {
-    expect(renderToStaticMarkup(<ProductCard product={{ ...product, inStock: false }} />)).toContain(">Agotado</span>");
+  it("marks an offer with its previous price, and a sold-out product only as sold out", () => {
+    const offer = renderToStaticMarkup(<ProductCard product={{ ...product, priceFromClp: 9990, compareAtFromClp: 12990 }} />);
+    expect(offer).toContain(">Oferta</span>");
+    expect(offer).toContain("Precio anterior </span>$12.990</s>");
+    const soldOutOffer = renderToStaticMarkup(<ProductCard product={{ ...product, compareAtFromClp: 15990, inStock: false }} />);
+    expect(soldOutOffer).toContain(">Agotado</span>");
+    expect(soldOutOffer).not.toContain(">Oferta</span>");
   });
 
   it("has a hidden skeleton with the same shape", () => {
     const html = renderToStaticMarkup(<ProductCardSkeleton />);
     expect(html).toMatch(/^<div aria-hidden="true"/);
-    expect(html).toContain("aspect-[4/5]");
+    expect(html).toContain("aspect-square");
+  });
+});
+
+describe("ProductCarousel", () => {
+  it("is a named region of scroll-snapped cards with named arrows", () => {
+    const products = [
+      { slug: "a", name: "A", category: "TERPENES" as const, priceFromClp: 990, compareAtFromClp: null, inStock: true, coverUrl: null },
+      { slug: "b", name: "B", category: "VAPES" as const, priceFromClp: 1990, compareAtFromClp: null, inStock: true, coverUrl: null },
+    ];
+    const html = renderToStaticMarkup(<ProductCarousel products={products} label="Colección destacada" />);
+    expect(html).toContain('aria-label="Colección destacada"');
+    expect(html).toContain('aria-label="Productos anteriores"');
+    expect(html).toContain('aria-label="Productos siguientes"');
+    expect(html).toContain("snap-x snap-mandatory");
+    expect(html.match(/snap-start/g)).toHaveLength(2);
   });
 });
 
@@ -159,7 +235,7 @@ describe("Skeleton and EmptyState", () => {
         icon={MagnifyingGlass}
         title="Sin resultados"
         description="Prueba con otra búsqueda."
-        action={<a href="/products">Ver todo el catálogo</a>}
+        action={<Link href="/products">Ver todo el catálogo</Link>}
       />,
     );
     expect(html).toMatch(/<svg[^>]*aria-hidden="true"/);
