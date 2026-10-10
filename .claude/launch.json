@@ -5,13 +5,13 @@
       "name": "api",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "-w", "@portal/api"],
-      "port": 4000
+      "port": 4100
     },
     {
       "name": "web",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "-w", "@portal/web"],
-      "port": 3000
+      "port": 3100
     }
   ]
 }

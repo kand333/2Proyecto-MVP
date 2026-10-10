@@ -17,8 +17,8 @@ Sin integraciones de terceros por defecto. Las recetas para agregarlas están en
 
 ```text
 apps/
-  api/        @portal/api: Next.js solo con Route Handlers REST (:4000) + Prisma
-  web/        @portal/web: Next.js App Router (:3000), sin acceso a BD
+  api/        @portal/api: Next.js solo con Route Handlers REST (:4100) + Prisma
+  web/        @portal/web: Next.js App Router (:3100), sin acceso a BD
 packages/
   shared/     @portal/shared: contrato REST (tipos, enums, esquemas Zod)
 docs/recipes/ integraciones opcionales
@@ -37,7 +37,7 @@ npm run db:up      # PostgreSQL 16 en 127.0.0.1:5433 (BDs app y app_test)
 npm run db:migrate && npm run db:seed && npm run dev
 ```
 
-- Web: http://localhost:3000 · API: http://localhost:4000
+- Web: http://localhost:3100 · API: http://localhost:4100
 - Usuarios de desarrollo: `admin@example.com` (ADMIN) y `user@example.com` (USER), contraseña `test1234`. El seed solo corre contra `localhost`.
 
 ## Comandos
