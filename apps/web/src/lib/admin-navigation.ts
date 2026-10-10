@@ -1,10 +1,11 @@
-export type AdminSection = "dashboard" | "items" | "users" | "account";
+export type AdminSection = "dashboard" | "products" | "items" | "users" | "account";
 
 export type AdminNavigationItem = { section: AdminSection; label: string; href: string };
 
 /** Sidebar of /admin, in this order. */
 export const adminNavigationItems: readonly AdminNavigationItem[] = [
   { section: "dashboard", label: "Panel administración", href: "/admin" },
+  { section: "products", label: "Administrar productos", href: "/admin/products" },
   { section: "items", label: "Administrar items", href: "/admin/items" },
   { section: "users", label: "Administrar usuarios", href: "/admin/users" },
   { section: "account", label: "Mi cuenta", href: "/admin/account" },
