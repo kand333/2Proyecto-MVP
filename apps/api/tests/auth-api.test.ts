@@ -28,7 +28,7 @@ const jsonRequest = (path: string, body: unknown) =>
 /** Value of the session cookie set by a response ("" when it is cleared). */
 function sessionCookie(response: Response): { value: string; attributes: string } | null {
   const header = response.headers.get("set-cookie");
-  const match = header?.match(/terpenos_session=([^;]*);?(.*)/);
+  const match = header?.match(/terpenex_session=([^;]*);?(.*)/);
   return match ? { value: match[1], attributes: match[2] } : null;
 }
 
@@ -51,7 +51,7 @@ async function login(body: unknown) {
 
 async function me(cookieValue?: string) {
   const { GET } = await import("@/app/api/auth/me/route");
-  const headers = cookieValue === undefined ? undefined : { cookie: `terpenos_session=${cookieValue}` };
+  const headers = cookieValue === undefined ? undefined : { cookie: `terpenex_session=${cookieValue}` };
   return GET(new NextRequest(`${baseUrl}/me`, { headers }));
 }
 

@@ -24,7 +24,7 @@ async function createUser(label: string) {
     data: { name: label, email: emailFor(label), passwordHash: await hashPassword(password) },
   });
   const { createSessionToken } = await import("@/lib/auth/session-token");
-  return { id: user.id, cookie: `terpenos_session=${createSessionToken(user.id)}` };
+  return { id: user.id, cookie: `terpenex_session=${createSessionToken(user.id)}` };
 }
 
 function jsonRequest(path: string, method: string, body: unknown, cookie?: string) {
@@ -121,7 +121,7 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("account API", () => {
   it("logs out the other devices when the password changes, keeping the current session", { timeout: 30_000 }, async () => {
     const user = await createUser("devices");
     const { createSessionToken } = await import("@/lib/auth/session-token");
-    const otherDevice = `terpenos_session=${createSessionToken(user.id, Date.now() - 60_000)}`;
+    const otherDevice = `terpenex_session=${createSessionToken(user.id, Date.now() - 60_000)}`;
     const me = async (cookie: string) => {
       const { GET } = await import("@/app/api/auth/me/route");
       return (await GET(new NextRequest("http://localhost:3000/api/auth/me", { headers: { cookie } }))).status;
@@ -132,7 +132,7 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("account API", () => {
     const response = await PUT(jsonRequest("password", "PUT", { currentPassword: password, newPassword: "nueva clave 3" }, otherDevice));
     expect(response.status).toBe(204);
     // The session that made the change gets a fresh cookie and keeps working...
-    const renewed = response.headers.get("set-cookie")?.match(/terpenos_session=[^;]+/)?.[0];
+    const renewed = response.headers.get("set-cookie")?.match(/terpenex_session=[^;]+/)?.[0];
     expect(renewed).toBeDefined();
     expect(await me(renewed ?? "")).toBe(200);
     // ...while every session issued before the change is rejected.

@@ -19,7 +19,7 @@ describe("proxy", () => {
   });
 
   it("lets a request with a session cookie through (the layouts verify it)", () => {
-    const response = proxy(request("/account", "terpenos_session=any.value"));
+    const response = proxy(request("/account", "terpenex_session=any.value"));
     expect(response.headers.get("location")).toBeNull();
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });

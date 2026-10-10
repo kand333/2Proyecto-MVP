@@ -1,15 +1,15 @@
-# Tienda de terpenos y cigarrillos electrónicos
+# Terpenex Company: tienda de terpenos y cigarrillos electrónicos
 
 > Estado: SHIP
-> Tipo: starter · Tamaño: normal · Actualizado: 2026-10-08
+> Tipo: starter · Tamaño: normal · Actualizado: 2026-10-09
 
 ## Objetivo
 E-commerce para Chile que vende terpenos, cigarrillos electrónicos, líquidos y accesorios solo a mayores de 18 años.
 Un visitante verificado como mayor de edad encuentra un producto, elige variante y completa un pedido (con o sin cuenta) en menos de 3 minutos; el admin gestiona catálogo, stock y pedidos desde `/admin` sin tocar la base de datos.
 
 ## Alcance
-- Dentro: catálogo con variantes y stock, verificación de edad, carrito, checkout como invitado o con cuenta, pago por transferencia confirmado por el admin, envío con tarifa fija o retiro, popup de suscripción con 10 % de descuento en el primer pedido, gestión de pedidos, identidad de la tienda y páginas legales.
-- Fuera: pasarela de pago real (RF-11, la conecta el usuario más adelante), envío de emails, integración con couriers, tarifas por región, verificación documental de identidad, multi-moneda, reseñas, cupones distintos del de bienvenida, exportar Items a CSV (DEC-011).
+- Dentro: catálogo con variantes y stock, verificación de edad, carrito, checkout como invitado o con cuenta, pago por transferencia confirmado por el admin, envío con tarifa fija o retiro, popup y formulario de suscripción con 10 % de descuento en el primer pedido, ofertas con precio anterior y productos destacados, gestión de pedidos, identidad Terpenex con portada según la estructura de referencia (DEC-016), contacto y páginas legales.
+- Fuera: pasarela de pago real (RF-11, la conecta el usuario más adelante), envío de emails, integración con couriers, tarifas por región, verificación documental de identidad, multi-moneda, reseñas, cupones distintos del de bienvenida, exportar Items a CSV (DEC-011), mascota o contenido de la landing de referencia, formulario de contacto (solo canales).
 
 ## Workstreams
 
@@ -41,7 +41,7 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 ### WS-06 · Identidad, diseño y legal · M
 - Objetivo: la tienda tiene una dirección visual propia y coherente en todas las pantallas, y muestra la información legal mínima.
 - deps: —
-- Aceptación: dado cualquier página pública, cuando se carga, entonces muestra el nombre de la tienda y enlaces a términos, privacidad, envíos y advertencia sanitaria.
+- Aceptación: dado cualquier página pública, cuando se carga, entonces muestra el wordmark Terpenex, el header con Inicio, Catálogo y Contacto, y enlaces a términos, privacidad, envíos y advertencia sanitaria.
 
 ## Requisitos funcionales
 - **RF-01** (WS-01) Admin crea, edita, publica/despublica y archiva productos con categoría, slug único, descripción y 1-20 variantes (nombre, SKU único, precio CLP entero > 0, stock ≥ 0, activa). Dado un SKU repetido, cuando guarda, entonces 409.
@@ -60,12 +60,18 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 - **RF-14** (WS-04) Admin ve en `/admin/subscribers` los suscriptores paginados con fecha y si canjearon el código.
 - **RF-15** (WS-05) Admin lista pedidos en `/admin/orders` (filtro por estado, búsqueda por número o email, paginado), ve el detalle y aplica transiciones válidas: `PENDING_PAYMENT→PAID|CANCELLED`, `PAID→SHIPPED|DELIVERED|CANCELLED`, `SHIPPED→DELIVERED`. `SHIPPED` exige número de seguimiento. Cancelar repone stock y libera el código de descuento. Dada una transición inválida, entonces 409.
 - **RF-16** (WS-05) Un cliente con cuenta ve sus pedidos en `/account/orders` y su detalle; los pedidos como invitado con el mismo email no se vinculan.
-- **RF-17** (WS-06) Dirección de diseño e identidad: `docs/design.md` define la dirección visual (DEC-013) y la tienda la aplica: nombre, `APP_SLUG`, metadatos, tokens claro y oscuro de `globals.css` y tipografía.
+- **RF-17** (WS-06) Dirección de diseño e identidad: `docs/design.md` define la dirección visual (DEC-013) y la tienda la aplica: nombre, `APP_SLUG`, metadatos, tokens claro y oscuro de `globals.css` y tipografía (identidad actualizada por RF-23).
 - **RF-18** (WS-06) Páginas `/legal/terms`, `/legal/privacy`, `/legal/shipping` y `/legal/health-warning`, enlazadas en el footer. Contenido inicial con texto marcado "Borrador pendiente de revisión legal".
 - **RF-19** (WS-06) Retirar la capa pública de Item según la receta de `CLAUDE.md`; el módulo admin de Item se conserva (DEC-009).
 - **RF-21** (WS-01) Fotos de producto: el admin sube hasta 8 fotos JPG, PNG o WebP de ≤ 5 MB por producto y puede borrarlas; la primera subida es la portada. El catálogo muestra la portada (o un marcador neutro si no hay) y la ficha, la galería. Dado un archivo que no es imagen por su contenido (aunque se llame `.jpg`), cuando lo sube, entonces 415; > 5 MB → 413; sin claves de Cloudinary configuradas → 503 y el resto de la tienda funciona (DEC-012).
 - **RF-20** (WS-04) Admin descarga desde `/admin/subscribers` un CSV con los suscriptores (`email,code,consentAt,redeemedAt`, más recientes primero, máx. 10 000 filas): RFC 4180, BOM UTF-8 y celdas que empiezan por `=`, `+`, `-`, `@`, tab o CR prefijadas con `'` (DEC-011). Dado un USER, cuando pide el CSV, entonces 403.
 - **RF-22** (WS-06) Calidad de UI: componentes base reutilizables en `components/ui/`, solo tokens e iconos Phosphor (DEC-014); contraste AA en ambos modos, foco visible, 375 px sin desborde y animaciones solo CSS desactivadas con `prefers-reduced-motion`. Dada la auditoría de `web-design-guidelines` sobre las páginas, entonces no hay hallazgos críticos.
+- **RF-23** (WS-06) Identidad Terpenex Company (DEC-015): `siteConfig.name`, `APP_SLUG = "terpenex"`, wordmark tipográfico, favicon desde `public/brand/terpenex-symbol.png`, tokens claro y oscuro de `docs/design.md` con `highlight` y `on-highlight`, Archivo (`font-display`) y Geist (`font-sans`). Dado `design-tokens.test.ts`, cuando corre, entonces todos los pares de texto de la tabla de contraste son ≥ 4,5:1 en ambos modos.
+- **RF-24** (WS-06) Header y pie con la estructura de `docs/design.md` (DEC-016): nav Inicio, Catálogo (`/products`) y Contacto (`/contact`); botones de icono Buscar, Cuenta y Carrito; pie con suscripción (RF-26), enlaces legales (RF-18), copyright y redes de `siteConfig.social` (las vacías no se muestran). Dado el buscador del header con "limón", cuando se envía, entonces navega a `/products?search=lim%C3%B3n`.
+- **RF-25** (WS-06) Portada `/` con los bloques de `docs/design.md` en orden: hero, cinta, colección destacada, banda de marca, sección dividida y quiénes somos. Imágenes en `lib/home-content.ts`; `null` muestra el panel de marca del mismo tamaño. Dado 0 productos destacados, cuando carga, entonces el bloque de colección destacada no se renderiza.
+- **RF-26** (WS-04) Suscripción en el pie de todas las páginas públicas: email y consentimiento obligatorio, envía a `POST /api/subscribers` y muestra el código con botón de copiar. Dado un email ya suscrito, cuando se envía, entonces muestra el mismo código; errores junto al campo.
+- **RF-27** (WS-01) Ofertas y destacados (DEC-017): cada variante admite `compareAtPriceClp` opcional (entero > `priceClp`) y cada producto `isFeatured`; `GET /api/products?featured=true` lista solo destacados; el DTO público expone `compareAtFromClp` (de la variante activa más barata) y `compareAtPriceClp` por variante. La UI muestra el badge "Oferta" y el precio anterior tachado; "Agotado" reemplaza a "Oferta". Dado `compareAtPriceClp` ≤ `priceClp`, cuando el admin guarda, entonces 400.
+- **RF-28** (WS-06) Página `/contact` con los canales de `siteConfig.contact` (WhatsApp, email, Instagram, horario); los vacíos no se muestran. Dado todos vacíos, cuando se abre, entonces muestra un estado vacío sin enlaces rotos.
 
 ## No funcionales
 - Dinero en CLP como entero (DEC-003); sin decimales en la UI (`$12.990`).
@@ -81,9 +87,14 @@ Un visitante verificado como mayor de edad encuentra un producto, elige variante
 - Pedido cancelado que usó el código: el código vuelve a estar disponible.
 - Cuenta antigua (admin o seed) sin fecha de nacimiento: el checkout la pide.
 - Carrito vacío o con cantidades fuera de 1-10: 400.
+- Producto destacado pero despublicado, archivado o sin variante activa: no aparece en la portada (RF-25, RF-27).
+- Oferta solo en una variante que no es la más barata: la tarjeta no muestra "Oferta"; la ficha la muestra al elegir esa variante.
 
 ## Riesgos y pendientes
 - [PENDIENTE: revisión legal en Chile antes de publicar — advertencias sanitarias obligatorias, restricciones de publicidad de productos con nicotina (afecta al popup de marketing) y condiciones de venta y despacho. No bloquea el desarrollo, sí el lanzamiento]
-- [PENDIENTE: nombre definitivo de la tienda — se usa "Terpenos & Vapes" como provisional]
+- Nombre definitivo resuelto: Terpenex Company (DEC-015).
+- [PENDIENTE: datos de contacto y URLs de redes reales para `siteConfig.contact` y `siteConfig.social` — no bloquea; los vacíos no se muestran]
+- [PENDIENTE: imágenes de la portada (hero, sección dividida) — bloquea solo T039; mientras, panel de marca]
+- El precio anterior de una oferta debe ser un precio real cobrado antes (Ley del Consumidor); la revisión legal incluye si se pueden destacar productos con nicotina en la portada.
 - Las pasarelas pueden rechazar el rubro: confirmarlo antes de RF-11.
 - Sin emails, el cliente invitado depende del enlace con token: la página de confirmación pide guardarlo.
