@@ -7,7 +7,7 @@ export default function AdminItemNotFound() {
       <p className="text-lg text-muted">Este item no existe o ya fue eliminado.</p>
       <Link
         href="/admin/items"
-        className="inline-flex h-12 items-center rounded-full bg-accent px-7 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
+        className="inline-flex h-12 items-center rounded-sm bg-accent px-7 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
       >
         Volver a items
       </Link>

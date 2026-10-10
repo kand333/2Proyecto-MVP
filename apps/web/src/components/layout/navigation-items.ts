@@ -3,12 +3,11 @@ export type NavigationItem = {
   href: string;
 };
 
+/** Main navigation of the header (docs/design.md): the account and the cart are icons beside it. */
 export const navigationItems: readonly NavigationItem[] = [
   { label: "Inicio", href: "/" },
   { label: "Catálogo", href: "/products" },
-  // Public Item layer: remove this entry together with app/(site)/items.
-  { label: "Items", href: "/items" },
-  { label: "Ingresar", href: "/login" },
+  { label: "Contacto", href: "/contact" },
 ];
 
 /**
@@ -17,9 +16,6 @@ export const navigationItems: readonly NavigationItem[] = [
  */
 export function getActiveNavigationHref(pathname: string): string | null {
   if (pathname === "/") return "/";
-  // Reached from the user name shown in place of «Ingresar».
-  if (pathname === "/account" || pathname.startsWith("/account/")) return "/account";
-
   const item = navigationItems.find(({ href }) => href !== "/" && (pathname === href || pathname.startsWith(`${href}/`)));
   return item?.href ?? null;
 }

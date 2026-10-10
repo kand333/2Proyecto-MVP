@@ -62,55 +62,55 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T007, T030
   - done: dado `/products` con filtros en la URL y `/products/[slug]` con selector de variante, cuando la variante elegida tiene stock 0, entonces muestra "Agotado" y deshabilita "Añadir al carrito"; las categorías `VAPES` y `E_LIQUIDS` muestran la advertencia sanitaria; sin fotos (llegan en T029) se ve el marcador de `ProductCard`; una variante con precio anterior lo muestra tachado en la ficha
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T011** Ajustes de tienda: modelo y API (WS-03 · RF-10 · M)
+- [x] **T011** Ajustes de tienda: modelo y API (WS-03 · RF-10 · M)
   - deps: —
   - done: dado `ShopSettings` (fila única creada por migración con valores por defecto), `GET/PUT /api/admin/settings` con `requireAdmin` y `GET /api/settings` público sin datos internos, cuando corre `tests/settings-api.test.ts`, entonces cubre 200, 400 (montos negativos), 401/403
   - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm run typecheck`
-- [ ] **T012** Admin web de ajustes (WS-03 · RF-10 · S)
+- [x] **T012** Admin web de ajustes (WS-03 · RF-10 · S)
   - deps: T011, T030
   - done: dado `/admin/settings` con `getAdminUser`, cuando el admin guarda una tarifa nueva, entonces ve `flash()` y el valor persiste al recargar
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T013** Contrato y modelo de pedidos (WS-03 · RF-08,RF-09 · M)
+- [x] **T013** Contrato y modelo de pedidos (WS-03 · RF-08,RF-09 · M)
   - deps: T005
   - done: dado `order.ts` en shared (estados, métodos de envío, esquemas de cotización y pedido, regiones de Chile) y `Order`/`OrderItem` migrados (`number` correlativo, `accessToken` único, snapshot de nombre/SKU/precio por línea, totales Int), cuando corren los tests de shared y `shared-contract.test.ts`, entonces los enums coinciden y los esquemas rechazan carrito vacío, cantidades fuera de 1-10 y despacho sin dirección
   - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm run typecheck`
-- [ ] **T014** Carrito en el navegador (WS-03 · RF-06 · M)
+- [x] **T014** Carrito en el navegador (WS-03 · RF-06 · M)
   - deps: T010
   - done: dado `lib/cart.ts` (lectura y escritura tolerantes a fallos de `localStorage`) y la página `/cart`, cuando el visitante añade una variante desde la ficha y recarga, entonces el carrito la conserva y el header muestra el número de unidades (en el icono Carrito si T035 ya está hecha)
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T015** Suscripción y código de bienvenida: modelo y API (WS-04 · RF-12,RF-13,RF-14 · M)
+- [x] **T015** Suscripción y código de bienvenida: modelo y API (WS-04 · RF-12,RF-13,RF-14 · M)
   - deps: —
   - done: dado `Subscriber` (email único, código único, consentimiento, `redeemedAt`) migrado, `POST /api/subscribers` con límite de frecuencia y `GET /api/admin/subscribers` con `requireAdmin`, cuando el mismo email se suscribe dos veces, entonces recibe el mismo código; sin consentimiento, 400
   - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm run typecheck`
-- [ ] **T016** Popup de suscripción (WS-04 · RF-12 · M)
+- [x] **T016** Popup de suscripción (WS-04 · RF-12 · M)
   - deps: T015, T003
   - done: dado un visitante que ya pasó el aviso de edad, cuando lleva 10 s en el sitio, entonces ve el popup una sola vez; al suscribirse ve su código con botón de copiar; cerrar con `Escape` lo oculta para siempre en ese navegador; sin animación con `prefers-reduced-motion`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T017** Cotización en el servidor (WS-03 · RF-07,RF-13 · L)
+- [x] **T017** Cotización en el servidor (WS-03 · RF-07,RF-13 · L)
   - deps: T011, T013, T015
   - done: dado `POST /api/checkout/quote`, cuando corre `tests/checkout-quote-api.test.ts`, entonces usa precios de la BD, marca líneas sin stock o inactivas, aplica envío gratis desde el umbral, retiro a $0 y el 10 % solo con email suscrito y sin pedidos previos no cancelados
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T018** Creación de pedidos (WS-03 · RF-08,RF-13 · L)
+- [x] **T018** Creación de pedidos (WS-03 · RF-08,RF-13 · L)
   - deps: T017, T002
   - done: dado `POST /api/orders` (invitado o con sesión, con límite de frecuencia), cuando corre `tests/orders-api.test.ts`, entonces crea el pedido `PENDING_PAYMENT` y descuenta stock en una transacción (DEC-004), devuelve el `accessToken`, responde 409 si una línea no alcanza (sin efectos), 422 si el comprador es menor y marca el código como canjeado; dos pedidos concurrentes por la última unidad: solo uno gana
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T019** Checkout y confirmación web (WS-03 · RF-08,RF-09 · L)
+- [x] **T019** Checkout y confirmación web (WS-03 · RF-08,RF-09 · L)
   - deps: T014, T018
   - done: dado `/checkout` (cotiza al cambiar envío o código; pide fecha de nacimiento si falta) y `/orders/[token]`, cuando el visitante confirma, entonces se vacía el carrito y ve número, estado, totales e instrucciones de transferencia, con aviso de guardar el enlace; token inválido → 404
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T020** API admin de pedidos y transiciones (WS-05 · RF-15 · L)
+- [x] **T020** API admin de pedidos y transiciones (WS-05 · RF-15 · L)
   - deps: T018
   - done: dado `GET /api/admin/orders`, `GET /api/admin/orders/[id]` y `PATCH /api/admin/orders/[id]/status` con `requireAdmin`, cuando corre `tests/orders-admin-api.test.ts`, entonces cubre cada transición válida, 409 en las inválidas, 400 en `SHIPPED` sin seguimiento, y cancelar repone stock y libera el código
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T021** Admin web de pedidos (WS-05 · RF-15 · L)
+- [x] **T021** Admin web de pedidos (WS-05 · RF-15 · L)
   - deps: T020, T030
   - done: dado `/admin/orders` (filtros en la URL) y `/admin/orders/[id]` con `getAdminUser`, cuando el admin marca un pedido pagado y luego enviado con seguimiento, entonces los botones solo ofrecen transiciones válidas, cancelar pide confirmación (`ConfirmDialog`) y cada cambio muestra `flash()`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T022** Mis pedidos (WS-05 · RF-16 · M)
+- [x] **T022** Mis pedidos (WS-05 · RF-16 · M)
   - deps: T019
   - done: dado `GET /api/account/orders` con `requireUser` y la página `/account/orders` con `requireCustomerUser`, cuando un cliente con 2 pedidos la abre, entonces ve ambos y no ve pedidos de otros usuarios
   - verify: `npm test -w @portal/api && npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T023** Retirar la capa pública de Item (WS-06 · RF-19 · S)
+- [x] **T023** Retirar la capa pública de Item (WS-06 · RF-19 · S)
   - deps: T010
   - done: dado el procedimiento de `CLAUDE.md` aplicado y "Items" fuera de la navegación pública (si T035 no lo quitó ya) y admin (DEC-009), cuando corren todos los tests, entonces pasan y `/items` responde 404
   - verify: `npm test && npm run lint && npm run typecheck`
@@ -119,15 +119,15 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T019
   - done: dado el proveedor elegido en modo prueba, cuando el cliente paga, entonces el webhook verificado marca el pedido `PAID`
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T025** Páginas legales y advertencia sanitaria (WS-06 · RF-18 · S)
+- [x] **T025** Páginas legales y advertencia sanitaria (WS-06 · RF-18 · S)
   - deps: T030
   - done: dado `/legal/terms`, `/legal/privacy`, `/legal/shipping` y `/legal/health-warning` con texto marcado "Borrador pendiente de revisión legal", cuando se abre cualquier página pública, entonces el footer enlaza las cuatro
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T026** Admin web de suscriptores (WS-04 · RF-14 · S)
+- [x] **T026** Admin web de suscriptores (WS-04 · RF-14 · S)
   - deps: T015, T030
   - done: dado `/admin/subscribers` con `getAdminUser` y entrada en la navegación admin, cuando hay 15 suscriptores, entonces se ven paginados con fecha y estado de canje
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T027** Exportar suscriptores a CSV (WS-04 · RF-20 · M)
+- [x] **T027** Exportar suscriptores a CSV (WS-04 · RF-20 · M)
   - deps: T026
   - done: dado `apps/api/src/lib/csv.ts` con tests de comas, comillas, saltos de línea, BOM y `=cmd`, `GET /api/admin/subscribers/export` con `requireAdmin` (`text/csv; charset=utf-8`, adjunto `subscribers.csv`, `Cache-Control: no-store`) y el enlace «Exportar CSV» en `/admin/subscribers`, cuando un admin lo descarga, entonces recibe cabecera + filas escapadas; sin sesión 401, USER 403
   - verify: `npm test -w @portal/api && npm test -w @portal/web && npm run lint && npm run typecheck`
@@ -139,11 +139,11 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T028, T009, T010
   - done: dado el uploader en `/admin/products/[id]/edit` (`postForm` de `lib/api-client.ts`, errores junto al campo, borrar con `ConfirmDialog`), `lib/image-loader.ts` y el bloque `images` en `apps/web/next.config.ts` (sin tocar `agentRules`), cuando un producto tiene 3 fotos, entonces el catálogo muestra la primera con `next/image` y la ficha las 3 con texto alternativo
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T035** Header y pie según la referencia (WS-06 · RF-24 · M)
+- [x] **T035** Header y pie según la referencia (WS-06 · RF-24 · M)
   - deps: T034, T036, T010, T025
   - done: dado el header y el pie de `docs/design.md` (nav Inicio, Catálogo y Contacto; `IconButton` Buscar, Cuenta y Carrito; pie con legales de T025, copyright y redes), cuando se busca "limón" desde el header, entonces navega a `/products?search=lim%C3%B3n`; `Escape` cierra el buscador y devuelve el foco al icono; a 375 px la nav vive en el menú sin desborde; "Items" ya no aparece en la nav pública; redes vacías no se renderizan
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T037** Suscripción en el pie (WS-04 · RF-26 · S)
+- [x] **T037** Suscripción en el pie (WS-04 · RF-26 · S)
   - deps: T015, T035
   - done: dado `footer-subscribe.tsx` en el pie con campo `underline`, consentimiento obligatorio y la misma llamada a `POST /api/subscribers` que el popup, cuando se suscribe un email, entonces muestra su código con botón de copiar; sin consentimiento, el error aparece junto al checkbox sin llamar a la API
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
@@ -156,7 +156,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T038
   - done: dado `lib/home-content.ts` apuntando a esas imágenes con `next/image` (`priority` solo en el hero, `sizes` por bloque y texto alternativo), cuando se carga `/`, entonces no hay salto de layout y el velo del hero mantiene AA sobre la foto
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T031** Auditoría final de UI (WS-06 · RF-22 · M)
+- [x] **T031** Auditoría final de UI (WS-06 · RF-22 · M)
   - deps: T012, T016, T021, T022, T023, T025, T026, T029, T037, T038
   - done: dado `web-design-guidelines` sobre `apps/web/src/app/**` y `apps/web/src/components/**` y la lista de rechazo de `docs/design.md`, cuando termina la tarea, entonces no quedan hallazgos críticos, los menores aceptados se listan en el PR y ninguna página desborda a 375 px
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`

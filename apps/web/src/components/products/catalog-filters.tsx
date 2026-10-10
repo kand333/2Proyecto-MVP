@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { CATALOG_PATH, toCatalogQuery, type CatalogParams } from "@/lib/products";
 
 const chipClassName =
-  "inline-flex h-10 shrink-0 items-center rounded-full border px-4 text-sm font-medium transition-colors duration-200";
+  "inline-flex h-10 shrink-0 items-center rounded-sm border px-4 text-sm font-medium transition-colors duration-200";
 
 /** Category chips (links, so the filter lives in the URL) and a search form that keeps the category (RF-02). */
 export function CatalogFilters({ params }: { params: CatalogParams }) {

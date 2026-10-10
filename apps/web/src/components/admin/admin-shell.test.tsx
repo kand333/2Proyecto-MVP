@@ -19,14 +19,14 @@ describe("AdminShell", () => {
   it("shows the sections in order, the content and the main landmark", () => {
     const html = render("/admin");
     const labels = [...html.matchAll(/<span class="truncate">([^<]+)<\/span>/g)].map((match) => match[1]);
-    expect(labels.slice(0, 5)).toEqual(["Panel administración", "Administrar productos", "Administrar items", "Administrar usuarios", "Mi cuenta"]);
+    expect(labels.slice(0, 7)).toEqual(["Panel administración", "Pedidos", "Administrar productos", "Suscriptores", "Ajustes de tienda", "Administrar usuarios", "Mi cuenta"]);
     expect(html).toContain('<main id="main-content"');
     expect(html).toContain("<p>Contenido</p>");
     expect(html).toContain("Saltar al contenido principal");
   });
 
   it("marks the current section, including its sub-pages", () => {
-    expect(render("/admin/items/new")).toMatch(/<a aria-current="page"[^>]*href="\/admin\/items">/);
+    expect(render("/admin/products/new")).toMatch(/<a aria-current="page"[^>]*href="\/admin\/products">/);
     expect(render("/admin")).toMatch(/<a aria-current="page"[^>]*href="\/admin">/);
   });
 

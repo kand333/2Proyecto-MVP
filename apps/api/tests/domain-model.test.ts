@@ -30,6 +30,7 @@ describe.skipIf(!hasDatabaseUrl)("data model", () => {
     const prisma = await getPrisma();
     const namePattern = { contains: testRunId };
     await prisma.item.deleteMany({ where: { title: namePattern } });
+    await prisma.order.deleteMany({ where: { email: namePattern } });
     await prisma.product.deleteMany({ where: { slug: namePattern } });
     await prisma.user.deleteMany({ where: { email: namePattern } });
     await prisma.$disconnect();
@@ -85,4 +86,29 @@ describe.skipIf(!hasDatabaseUrl)("data model", () => {
     await expect(variant(12990)).resolves.toMatchObject({ compareAtPriceClp: 12990 });
   });
 
+  it("numbers orders correlatively and rejects inconsistent totals or a delivery without address", async () => {
+    const prisma = await getPrisma();
+    const order = (overrides: Record<string, unknown> = {}) =>
+      prisma.order.create({
+        data: {
+          accessToken: uniqueName("token"),
+          email: `${uniqueName("order")}@example.com`,
+          name: "Comprador",
+          phone: "+56 9 1234 5678",
+          birthDate: new Date("1990-05-01"),
+          shippingMethod: "PICKUP",
+          subtotalClp: 20000,
+          discountClp: 2000,
+          shippingClp: 0,
+          totalClp: 18000,
+          ...overrides,
+        },
+      });
+    const first = await order();
+    const second = await order();
+    expect(first.status).toBe("PENDING_PAYMENT");
+    expect(second.number).toBeGreaterThan(first.number);
+    await expect(order({ totalClp: 20000 })).rejects.toThrow(/Order_amounts_check/);
+    await expect(order({ shippingMethod: "DELIVERY", shippingClp: 3990, totalClp: 21990 })).rejects.toThrow(/Order_delivery_address_check/);
+  });
 });

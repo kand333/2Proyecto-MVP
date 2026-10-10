@@ -37,9 +37,12 @@ export function AccountOverview({ user }: { user: AuthUser }) {
             <div className="mt-4 flex flex-col items-start gap-3">
               <Link
                 href="/account/edit"
-                className="inline-flex h-11 items-center rounded-full bg-accent px-6 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
+                className="inline-flex h-11 items-center rounded-sm bg-accent px-6 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
               >
                 Editar cuenta
+              </Link>
+              <Link href="/account/orders" className="text-sm font-semibold text-accent underline-offset-4 hover:underline">
+                Mis pedidos
               </Link>
             </div>
           </div>

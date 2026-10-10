@@ -1,5 +1,5 @@
 import { CaretDown } from "@phosphor-icons/react/ssr";
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode, Ref, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 /** Accessibility props that tie a control to its label, help and error. */
@@ -58,7 +58,7 @@ const controlClassName =
 const underlineClassName =
   "w-full border-0 border-b border-ink bg-transparent px-0 text-base text-ink transition-colors duration-200 focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-red-600 dark:aria-invalid:border-red-400";
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & { variant?: "box" | "underline" };
+type InputProps = InputHTMLAttributes<HTMLInputElement> & { variant?: "box" | "underline"; ref?: Ref<HTMLInputElement> };
 
 export function Input({ variant = "box", className, ...props }: InputProps) {
   return <input className={cn(variant === "box" ? controlClassName : underlineClassName, "h-11", className)} {...props} />;

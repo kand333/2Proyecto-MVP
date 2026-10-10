@@ -33,7 +33,7 @@ const rowClassName =
 const cellClassName = "xl:table-cell xl:border-b xl:border-line xl:py-4 xl:pr-4 xl:align-middle";
 const headerClassName = "py-3 pr-4 text-left font-semibold";
 const controlClassName =
-  "h-12 rounded-full border border-line bg-surface px-4 text-ink transition-colors duration-200 hover:border-accent/60 focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40";
+  "h-12 rounded-sm border border-line bg-surface px-4 text-ink transition-colors duration-200 hover:border-accent/60 focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40";
 /** Block-level (`flex w-fit`): an inline badge sits on the text baseline and ends up below the cell's middle. */
 const badgeClassName = "flex w-fit items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold";
 
@@ -88,7 +88,7 @@ export function AdminUserList({ result, params, currentAdminId }: AdminUserListP
             type="search"
             defaultValue={params.search}
             maxLength={MAX_SEARCH_LENGTH}
-            placeholder="Buscar por nombre o email"
+            placeholder="Buscar por nombre o email…"
             className={cn(controlClassName, "w-full px-5")}
           />
         </div>
@@ -118,7 +118,7 @@ export function AdminUserList({ result, params, currentAdminId }: AdminUserListP
         <div className="flex items-center gap-3 sm:col-span-2 lg:col-span-1">
           <button
             type="submit"
-            className="h-12 flex-1 rounded-full bg-accent px-7 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover lg:flex-none"
+            className="h-12 flex-1 rounded-sm bg-accent px-7 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover lg:flex-none"
           >
             Buscar
           </button>
@@ -136,7 +136,7 @@ export function AdminUserList({ result, params, currentAdminId }: AdminUserListP
       <p aria-live="polite" className="mt-6 text-sm text-muted">
         {meta.total === 0
           ? "0 usuarios"
-          : `${numberFormatter.format(firstShown)}–${numberFormatter.format(firstShown + users.length - 1)} de ${numberFormatter.format(meta.total)} ${meta.total === 1 ? "usuario" : "usuarios"}`}
+          : `${numberFormatter.format(firstShown)}-${numberFormatter.format(firstShown + users.length - 1)} de ${numberFormatter.format(meta.total)} ${meta.total === 1 ? "usuario" : "usuarios"}`}
       </p>
 
       {users.length === 0 ? (

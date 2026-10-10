@@ -14,7 +14,7 @@ import { cn } from "@/lib/cn";
 import { flash } from "@/lib/flash";
 
 const buttonClassName =
-  "inline-flex h-9 w-full items-center justify-center rounded-full border border-line px-2 text-sm max-sm:h-8 max-sm:text-xs font-semibold text-ink transition-colors duration-200 hover:border-accent hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-9 w-full items-center justify-center rounded-sm border border-line px-2 text-sm max-sm:h-8 max-sm:text-xs font-semibold text-ink transition-colors duration-200 hover:border-accent hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50";
 const dangerHoverClassName = "hover:border-red-700 hover:text-red-700 dark:hover:border-red-400 dark:hover:text-red-400";
 
 const errorMessageOf = (error: unknown) =>
@@ -183,13 +183,13 @@ function EditUserDialog({ user, onClose, confirm }: EditUserDialogProps) {
           </p>
         )}
         <div className="flex justify-end gap-3 pt-2">
-          <button type="button" onClick={onClose} className="h-11 rounded-full border border-line px-5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-accent hover:bg-paper">
+          <button type="button" onClick={onClose} className="h-11 rounded-sm border border-line px-5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-accent hover:bg-paper">
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isSaving}
-            className="h-11 rounded-full bg-accent px-5 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover disabled:opacity-70"
+            className="h-11 rounded-sm bg-accent px-5 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover disabled:opacity-70"
           >
             {isSaving ? "Guardando…" : "Guardar"}
           </button>

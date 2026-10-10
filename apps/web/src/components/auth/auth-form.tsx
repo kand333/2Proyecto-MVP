@@ -109,7 +109,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         <div className="flex flex-wrap items-center gap-4">
           <Link
             href={redirectPath}
-            className="inline-flex h-11 items-center rounded-full bg-accent px-6 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
+            className="inline-flex h-11 items-center rounded-sm bg-accent px-6 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
           >
             Continuar
           </Link>
@@ -186,7 +186,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <button
         type="submit"
         disabled={isSending}
-        className="h-11 w-full rounded-full bg-accent px-6 font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 disabled:translate-y-0 disabled:opacity-70"
+        className="h-11 w-full rounded-sm bg-accent px-6 font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 disabled:translate-y-0 disabled:opacity-70"
       >
         {isSending ? copy[mode].sending : copy[mode].submit}
       </button>

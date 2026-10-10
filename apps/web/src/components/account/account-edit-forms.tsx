@@ -54,7 +54,7 @@ function SubmitButton({ isSaving, label }: { isSaving: boolean; label: string })
     <button
       type="submit"
       disabled={isSaving}
-      className="h-11 rounded-full bg-accent px-6 font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 disabled:translate-y-0 disabled:opacity-70"
+      className="h-11 rounded-sm bg-accent px-6 font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 disabled:translate-y-0 disabled:opacity-70"
     >
       {isSaving ? "Guardando…" : label}
     </button>

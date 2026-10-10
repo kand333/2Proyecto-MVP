@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { getActiveNavigationHref, navigationItems } from "./navigation-items";
 
 describe("navigationItems", () => {
-  it("exposes the public navigation in order", () => {
-    expect(navigationItems.map((item) => item.label)).toEqual(["Inicio", "Catálogo", "Items", "Ingresar"]);
+  it("exposes the main navigation in order (the account and the cart are icons)", () => {
+    expect(navigationItems.map((item) => item.label)).toEqual(["Inicio", "Catálogo", "Contacto"]);
   });
 });
 
@@ -13,21 +13,13 @@ describe("getActiveNavigationHref", () => {
   });
 
   it("marks a section on its page and its sub-pages", () => {
-    expect(getActiveNavigationHref("/items")).toBe("/items");
-    expect(getActiveNavigationHref("/items/abc")).toBe("/items");
+    expect(getActiveNavigationHref("/products")).toBe("/products");
+    expect(getActiveNavigationHref("/products/terpeno-limon")).toBe("/products");
+    expect(getActiveNavigationHref("/contact")).toBe("/contact");
   });
 
-  it("marks login on the login page", () => {
-    expect(getActiveNavigationHref("/login")).toBe("/login");
-  });
-
-  it("marks the account (the user name link) on the account pages", () => {
-    expect(getActiveNavigationHref("/account")).toBe("/account");
-    expect(getActiveNavigationHref("/account/edit")).toBe("/account");
-  });
-
-  it("returns null for routes outside the public navigation", () => {
-    expect(getActiveNavigationHref("/admin")).toBeNull();
-    expect(getActiveNavigationHref("/itemsx")).toBeNull();
+  it("marks nothing elsewhere, and does not confuse a prefix with a section", () => {
+    expect(getActiveNavigationHref("/login")).toBeNull();
+    expect(getActiveNavigationHref("/productsx")).toBeNull();
   });
 });

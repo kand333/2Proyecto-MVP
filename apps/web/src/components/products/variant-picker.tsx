@@ -6,7 +6,9 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Price } from "@/components/ui/price";
+import { addToCart } from "@/lib/cart";
 import { cn } from "@/lib/cn";
+import { flash } from "@/lib/flash";
 
 function stockLabel(variant: PublicProductVariant) {
   if (!variant.inStock) return "Agotado";
@@ -63,8 +65,15 @@ export function VariantPicker({ variants }: { variants: PublicProductVariant[] }
         {stockLabel(selected)}
       </p>
 
-      {/* The cart arrives with T014, which wires this button to it. */}
-      <Button disabled={!selected.inStock} className="w-full sm:w-auto" iconEnd={<ShoppingBag />}>
+      <Button
+        disabled={!selected.inStock}
+        className="w-full sm:w-auto"
+        iconEnd={<ShoppingBag />}
+        onClick={() => {
+          addToCart(selected.id);
+          flash("Añadido al carrito.");
+        }}
+      >
         Añadir al carrito
       </Button>
     </div>

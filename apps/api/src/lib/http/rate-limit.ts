@@ -15,6 +15,10 @@ export const RATE_LIMITS = {
   // Many emails from one client (the per-email limit of 5 failures covers a single account).
   login: { name: "login", limit: 20, windowMs: 15 * 60 * 1000, message: "Demasiados intentos de ingreso. Espera unos minutos e inténtalo de nuevo." },
   register: { name: "register", limit: 5, windowMs: 60 * 60 * 1000, message: "Demasiados registros desde esta conexión. Inténtalo más tarde." },
+  // The checkout re-quotes on every change of shipping or code.
+  quote: { name: "quote", limit: 60, windowMs: 60 * 1000, message: "Demasiadas cotizaciones seguidas. Espera un momento." },
+  order: { name: "order", limit: 10, windowMs: 10 * 60 * 1000, message: "Demasiados pedidos seguidos desde esta conexión. Espera unos minutos." },
+  subscribe: { name: "subscribe", limit: 10, windowMs: 60 * 60 * 1000, message: "Demasiadas suscripciones desde esta conexión. Inténtalo más tarde." },
 } satisfies Record<string, RateLimitRule>;
 
 type Window = { count: number; start: number };

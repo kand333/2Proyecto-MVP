@@ -1,5 +1,19 @@
 "use client";
 
+import {
+  ArrowSquareOut,
+  CaretLeft,
+  EnvelopeSimple,
+  List,
+  Package,
+  Receipt,
+  SignOut,
+  SlidersHorizontal,
+  SquaresFour,
+  UserCircle,
+  Users,
+  type Icon as PhosphorIcon,
+} from "@phosphor-icons/react";
 import type { AuthUser } from "@portal/shared/auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,34 +27,24 @@ import { siteConfig } from "@/lib/site-config";
 
 const SIDEBAR_ID = "admin-sidebar";
 
-/** Outline icons drawn inline (no icon library). */
-const iconPaths: Record<AdminSection | "site" | "logout" | "collapse" | "menu", string> = {
-  dashboard: "M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z",
-  products: "M4 7.5 12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9",
-  items: "M4 6h16M4 12h16M4 18h10",
-  users: "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7M22 21a6 6 0 0 0-4-5.6",
-  account: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0",
-  site: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5",
-  logout: "M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11",
-  collapse: "M15 6l-6 6 6 6",
-  menu: "M4 7h16M4 12h16M4 17h16",
+/** Phosphor icons of the sidebar (DEC-014: no icon drawn by hand), one weight everywhere. */
+const icons: Record<AdminSection | "site" | "logout" | "collapse" | "menu", PhosphorIcon> = {
+  dashboard: SquaresFour,
+  orders: Receipt,
+  products: Package,
+  subscribers: EnvelopeSimple,
+  settings: SlidersHorizontal,
+  users: Users,
+  account: UserCircle,
+  site: ArrowSquareOut,
+  logout: SignOut,
+  collapse: CaretLeft,
+  menu: List,
 };
 
-function Icon({ name, className }: { name: keyof typeof iconPaths; className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.7}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn("size-5 shrink-0", className)}
-    >
-      <path d={iconPaths[name]} />
-    </svg>
-  );
+function Icon({ name, className }: { name: keyof typeof icons; className?: string }) {
+  const IconComponent = icons[name];
+  return <IconComponent aria-hidden="true" className={cn("size-5 shrink-0", className)} />;
 }
 
 const itemClassName =
