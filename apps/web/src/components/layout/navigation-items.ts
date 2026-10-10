@@ -5,6 +5,7 @@ export type NavigationItem = {
 
 export const navigationItems: readonly NavigationItem[] = [
   { label: "Inicio", href: "/" },
+  { label: "Catálogo", href: "/products" },
   // Public Item layer: remove this entry together with app/(site)/items.
   { label: "Items", href: "/items" },
   { label: "Ingresar", href: "/login" },

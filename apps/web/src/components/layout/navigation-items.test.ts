@@ -3,7 +3,7 @@ import { getActiveNavigationHref, navigationItems } from "./navigation-items";
 
 describe("navigationItems", () => {
   it("exposes the public navigation in order", () => {
-    expect(navigationItems.map((item) => item.label)).toEqual(["Inicio", "Items", "Ingresar"]);
+    expect(navigationItems.map((item) => item.label)).toEqual(["Inicio", "Catálogo", "Items", "Ingresar"]);
   });
 });
 
