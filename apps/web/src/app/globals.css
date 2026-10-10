@@ -90,6 +90,13 @@
   }
 }
 
+/* Home strip (DEC-016): the content is rendered twice, so moving it by half loops without a gap. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* Flash messages drop in from the top. */
 @keyframes flash-in {
   from {

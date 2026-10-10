@@ -1,26 +1,32 @@
-import Link from "next/link";
-import { siteConfig } from "@/lib/site-config";
+import type { PublicProductSummary } from "@portal/shared/product";
+import { HomeHero } from "@/components/home/home-hero";
+import { HomeMarquee } from "@/components/home/home-marquee";
+import { AboutStrip, BrandBand, FeaturedCollection, SplitFeature } from "@/components/home/home-sections";
+import { homeContent } from "@/lib/home-content";
+import { fetchCatalog } from "@/lib/public-products-api";
 
-const primaryLinkClassName =
-  "inline-flex h-12 items-center rounded-full bg-accent px-7 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover";
-const secondaryLinkClassName =
-  "inline-flex h-12 items-center rounded-full border border-line px-7 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink";
+/** The featured collection is optional: if the API fails, the rest of the home page still renders. */
+async function loadFeatured(): Promise<PublicProductSummary[]> {
+  try {
+    return (await fetchCatalog({ page: 1, search: "" }, { featured: true })).data;
+  } catch {
+    return [];
+  }
+}
 
-/** Landing page: replace it with the project's own. */
-export default function HomePage() {
+/** Home page with the blocks of docs/design.md in order (RF-25, DEC-016). */
+export default async function HomePage() {
+  const featured = await loadFeatured();
+  const { hero, marquee, featured: featuredText, band, split, about } = homeContent;
+
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-4 py-24 sm:px-6 lg:px-8">
-      <h1 className="max-w-3xl font-display text-5xl font-semibold tracking-tight text-ink sm:text-6xl">{siteConfig.name}</h1>
-      <p className="mt-5 max-w-2xl text-lg text-muted">{siteConfig.description}</p>
-      <div className="mt-10 flex flex-wrap gap-3">
-        {/* Public Item layer: remove this link together with app/(site)/items. */}
-        <Link href="/items" className={primaryLinkClassName}>
-          Ver items
-        </Link>
-        <Link href="/register" className={secondaryLinkClassName}>
-          Crear cuenta
-        </Link>
-      </div>
-    </section>
+    <>
+      <HomeHero titleLines={hero.titleLines} cta={hero.cta} image={hero.image} />
+      <HomeMarquee phrases={marquee} />
+      <FeaturedCollection title={featuredText.title} linkLabel={featuredText.linkLabel} products={featured} />
+      <BrandBand statement={band.statement} />
+      <SplitFeature title={split.title} body={split.body} image={split.image} />
+      <AboutStrip text={about} />
+    </>
   );
 }
