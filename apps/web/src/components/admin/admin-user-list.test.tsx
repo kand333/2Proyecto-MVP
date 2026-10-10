@@ -42,7 +42,7 @@ describe("AdminUserList", () => {
     expect(html).toContain(">Admin</span>");
     expect(html).toContain(">Activo<");
     expect(html).toContain(">Inactivo<");
-    expect(html).toContain("1–2 de 2 usuarios");
+    expect(html).toContain("1-2 de 2 usuarios");
   });
 
   it("shows in green only the users online right now, whatever their role", () => {
@@ -82,7 +82,7 @@ describe("AdminUserList", () => {
       { page: 2, search: "ana", role: "ADMIN", status: "inactive" },
       25,
     );
-    expect(html).toContain("11–20 de 25 usuarios");
+    expect(html).toContain("11-20 de 25 usuarios");
     expect(html).toContain('href="/admin/users?search=ana&amp;role=ADMIN&amp;status=inactive&amp;page=3"');
     expect(html).toContain('<option value="ADMIN" selected="">Administrador</option>');
     expect(html).toContain(">Limpiar</a>");

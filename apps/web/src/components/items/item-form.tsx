@@ -98,7 +98,7 @@ export function ItemForm({ item }: { item?: Item }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="h-11 rounded-full bg-accent px-6 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover disabled:opacity-60"
+        className="h-11 rounded-sm bg-accent px-6 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover disabled:opacity-60"
       >
         {isSubmitting ? "Guardando…" : item ? "Guardar cambios" : "Crear item"}
       </button>

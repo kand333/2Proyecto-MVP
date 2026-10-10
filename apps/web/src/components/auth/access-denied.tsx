@@ -10,7 +10,7 @@ export function AccessDenied() {
       <p className="text-lg text-muted">Esta sección es solo para administradores del sitio.</p>
       <Link
         href="/"
-        className="inline-flex h-12 items-center rounded-full bg-accent px-7 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
+        className="inline-flex h-12 items-center rounded-sm bg-accent px-7 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
       >
         Volver al inicio
       </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { CaretDown } from "@phosphor-icons/react";
 import { adminUserCreateSchema } from "@portal/shared/admin-user";
 import {
   PASSWORD_MAX_LENGTH,
@@ -99,18 +100,7 @@ export function AdminUserCreate() {
             </span>
             Nuevo usuario
           </span>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-5 text-muted transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
+          <CaretDown aria-hidden="true" className="size-5 text-muted transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
         </summary>
 
         <form
@@ -174,7 +164,7 @@ export function AdminUserCreate() {
             <button
               type="submit"
               disabled={status.tone === "saving"}
-              className="h-11 rounded-full bg-accent px-6 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover disabled:opacity-70"
+              className="h-11 rounded-sm bg-accent px-6 font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover disabled:opacity-70"
             >
               {status.tone === "saving" ? "Creando…" : "Crear usuario"}
             </button>

@@ -40,7 +40,7 @@ export function DeleteItemButton({ id, title }: { id: string; title: string }) {
         type="button"
         onClick={handleClick}
         disabled={isDeleting}
-        className="inline-flex h-9 items-center rounded-full border border-line px-4 text-sm font-medium text-ink transition-colors duration-200 hover:border-red-700 hover:text-red-700 disabled:opacity-60 dark:hover:border-red-400 dark:hover:text-red-400"
+        className="inline-flex h-9 items-center rounded-sm border border-line px-4 text-sm font-medium text-ink transition-colors duration-200 hover:border-red-700 hover:text-red-700 disabled:opacity-60 dark:hover:border-red-400 dark:hover:text-red-400"
       >
         Eliminar
       </button>

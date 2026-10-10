@@ -24,7 +24,7 @@ export function AdminItemList({ result, params }: AdminItemListProps) {
         <h1 className="font-display text-5xl font-semibold tracking-tight text-ink">Items</h1>
         <Link
           href={`${ADMIN_ITEMS_PATH}/new`}
-          className="inline-flex h-11 items-center rounded-full bg-accent px-6 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
+          className="inline-flex h-11 items-center rounded-sm bg-accent px-6 text-sm font-semibold text-on-accent transition-colors duration-200 hover:bg-accent-hover"
         >
           Nuevo item
         </Link>
@@ -40,10 +40,10 @@ export function AdminItemList({ result, params }: AdminItemListProps) {
           name="search"
           defaultValue={params.search}
           maxLength={MAX_SEARCH_LENGTH}
-          placeholder="Buscar por título"
-          className="h-11 min-w-0 flex-1 rounded-full border border-line bg-surface px-4 text-ink transition-colors duration-200 hover:border-accent/60 focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          placeholder="Buscar por título…"
+          className="h-11 min-w-0 flex-1 rounded-sm border border-line bg-surface px-4 text-ink transition-colors duration-200 hover:border-accent/60 focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
         />
-        <button type="submit" className="h-11 rounded-full border border-line px-6 text-sm font-semibold text-ink transition-colors duration-200 hover:border-accent">
+        <button type="submit" className="h-11 rounded-sm border border-line px-6 text-sm font-semibold text-ink transition-colors duration-200 hover:border-accent">
           Buscar
         </button>
       </form>
@@ -70,7 +70,7 @@ export function AdminItemList({ result, params }: AdminItemListProps) {
               <div className="flex items-center gap-2">
                 <Link
                   href={`${ADMIN_ITEMS_PATH}/${item.id}/edit`}
-                  className="inline-flex h-9 items-center rounded-full border border-line px-4 text-sm font-medium text-ink transition-colors duration-200 hover:border-accent"
+                  className="inline-flex h-9 items-center rounded-sm border border-line px-4 text-sm font-medium text-ink transition-colors duration-200 hover:border-accent"
                 >
                   Editar
                 </Link>
