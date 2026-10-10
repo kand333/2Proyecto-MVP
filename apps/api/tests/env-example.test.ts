@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const requiredVariableNames = ["DATABASE_URL", "AUTH_SECRET"];
+const requiredVariableNames = ["DATABASE_URL", "AUTH_SECRET", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 
-const secretVariableNames = ["AUTH_SECRET"];
+const secretVariableNames = ["AUTH_SECRET", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 
 function parseEnvironmentFile(content: string): Map<string, string> {
   const variables = new Map<string, string>();

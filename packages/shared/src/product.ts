@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { paginationQuerySchema } from "./pagination";
+import type { ProductImage } from "./product-image";
 
 // Contract of the catalog REST endpoints (RF-01, RF-02, RF-03). Prices are whole CLP (DEC-003).
 
@@ -57,12 +58,23 @@ export const productVariantSchema = z.object({
     .int({ error: "El precio debe ser un número entero de pesos" })
     .positive({ error: "El precio debe ser mayor que 0" })
     .max(MAX_PRICE_CLP, { error: "El precio es demasiado alto" }),
+  /** Real previous price shown struck through as an offer (RF-27, DEC-017); null = no offer. */
+  compareAtPriceClp: z
+    .number({ error: "Ingresa el precio anterior en pesos" })
+    .int({ error: "El precio anterior debe ser un número entero de pesos" })
+    .positive({ error: "El precio anterior debe ser mayor que 0" })
+    .max(MAX_PRICE_CLP, { error: "El precio anterior es demasiado alto" })
+    .nullable()
+    .default(null),
   stock: z
     .number({ error: "Ingresa el stock" })
     .int({ error: "El stock debe ser un número entero" })
     .min(0, { error: "El stock no puede ser negativo" })
     .max(MAX_VARIANT_STOCK, { error: "El stock es demasiado alto" }),
   isActive: z.boolean({ error: "Estado de la variante inválido" }).default(true),
+}).refine((variant) => variant.compareAtPriceClp === null || variant.compareAtPriceClp > variant.priceClp, {
+  path: ["compareAtPriceClp"],
+  error: "El precio anterior debe ser mayor que el precio",
 });
 export type ProductVariantInput = z.input<typeof productVariantSchema>;
 export type ProductVariantData = z.output<typeof productVariantSchema>;
@@ -95,6 +107,8 @@ const productFields = {
     .max(PRODUCT_DESCRIPTION_MAX_LENGTH, { error: `La descripción admite hasta ${PRODUCT_DESCRIPTION_MAX_LENGTH} caracteres` }),
   category: categorySchema,
   isPublished: z.boolean({ error: "Estado de publicación inválido" }),
+  /** Shown in the home page's featured collection (RF-27). */
+  isFeatured: z.boolean({ error: "Estado de destacado inválido" }),
   variants: variantsSchema,
 };
 
@@ -103,6 +117,7 @@ export const productCreateSchema = z.object({
   ...productFields,
   description: productFields.description.default(""),
   isPublished: productFields.isPublished.default(false),
+  isFeatured: productFields.isFeatured.default(false),
 });
 export type ProductCreate = z.output<typeof productCreateSchema>;
 
@@ -117,6 +132,7 @@ export const productUpdateSchema = z
     description: productFields.description.optional(),
     category: productFields.category.optional(),
     isPublished: productFields.isPublished.optional(),
+    isFeatured: productFields.isFeatured.optional(),
     variants: productFields.variants.optional(),
   })
   .refine((update) => Object.values(update).some((value) => value !== undefined), {
@@ -127,10 +143,14 @@ export type ProductUpdate = z.output<typeof productUpdateSchema>;
 // An empty query value (e.g. "?category=") means the filter is not used.
 const emptyToUndefined = (value: unknown) => (typeof value === "string" && value.trim() === "" ? undefined : value);
 
-/** Query of `GET /api/products`: page, search over the name and category (same names as the web URL). */
+/**
+ * Query of `GET /api/products`: page, search over the name, category and `featured=true` for the home
+ * page collection (same names as the web URL).
+ */
 export const productListQuerySchema = z.object({
   ...paginationQuerySchema.shape,
   category: z.preprocess(emptyToUndefined, categorySchema.optional()),
+  featured: z.preprocess(emptyToUndefined, z.stringbool({ error: "Filtro de destacados inválido" }).optional()),
 });
 export type ProductListQuery = z.output<typeof productListQuerySchema>;
 
@@ -149,6 +169,7 @@ export type ProductVariant = {
   name: string;
   sku: string;
   priceClp: number;
+  compareAtPriceClp: number | null;
   stock: number;
   isActive: boolean;
   position: number;
@@ -163,7 +184,10 @@ export type Product = {
   category: ProductCategory;
   isPublished: boolean;
   isArchived: boolean;
+  isFeatured: boolean;
   variants: ProductVariant[];
+  /** In order; the first is the cover (RF-21). */
+  images: ProductImage[];
   createdAt: string;
   updatedAt: string;
 };
@@ -174,6 +198,8 @@ export type PublicProductVariant = {
   name: string;
   sku: string;
   priceClp: number;
+  /** Previous price of an offer, struck through in the UI; null = no offer. */
+  compareAtPriceClp: number | null;
   inStock: boolean;
   /** In stock with LOW_STOCK_THRESHOLD units or fewer. */
   lowStock: boolean;
@@ -186,6 +212,8 @@ export type PublicProduct = {
   description: string;
   category: ProductCategory;
   variants: PublicProductVariant[];
+  /** Gallery in order (RF-21). */
+  images: ProductImage[];
 };
 
 /** A card of the catalog list (`GET /api/products`). */
@@ -195,7 +223,11 @@ export type PublicProductSummary = {
   category: ProductCategory;
   /** Lowest price among the active variants. */
   priceFromClp: number;
+  /** Previous price of the cheapest active variant; null when it is not on offer. */
+  compareAtFromClp: number | null;
   inStock: boolean;
+  /** URL of the first photo, or null for the neutral frame (RF-21). */
+  coverUrl: string | null;
 };
 
 const clpFormat = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
