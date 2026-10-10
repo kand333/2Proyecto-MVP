@@ -22,8 +22,28 @@ describe("productCreateSchema", () => {
       description: "",
       category: "TERPENES",
       isPublished: false,
-      variants: [{ name: "10 ml", sku: "TER-LIM-10", priceClp: 12990, stock: 5, isActive: true }],
+      isFeatured: false,
+      variants: [{ name: "10 ml", sku: "TER-LIM-10", priceClp: 12990, compareAtPriceClp: null, stock: 5, isActive: true }],
     });
+  });
+
+  it("accepts a previous price above the price, or null", () => {
+    const offer = productCreateSchema.parse({ ...valid, variants: [{ ...variant, compareAtPriceClp: 15990 }] });
+    expect(offer.variants[0]?.compareAtPriceClp).toBe(15990);
+    const noOffer = productCreateSchema.parse({ ...valid, variants: [{ ...variant, compareAtPriceClp: null }] });
+    expect(noOffer.variants[0]?.compareAtPriceClp).toBeNull();
+  });
+
+  it.each([12990, 9990])("rejects a previous price of %i, not above the price, on its own field", (compareAtPriceClp) => {
+    const issue = issueOf(productCreateSchema.safeParse({ ...valid, variants: [{ ...variant, compareAtPriceClp }] }));
+    expect(issue?.message).toBe("El precio anterior debe ser mayor que el precio");
+    expect(issue?.path).toEqual(["variants", 0, "compareAtPriceClp"]);
+  });
+
+  it("rejects a previous price that is not whole pesos", () => {
+    expect(
+      issueOf(productCreateSchema.safeParse({ ...valid, variants: [{ ...variant, compareAtPriceClp: 15990.5 }] }))?.message,
+    ).toBe("El precio anterior debe ser un número entero de pesos");
   });
 
   it.each([
@@ -71,6 +91,7 @@ describe("productCreateSchema", () => {
 describe("productUpdateSchema", () => {
   it("accepts any single field and rejects an empty change", () => {
     expect(productUpdateSchema.parse({ isPublished: true })).toEqual({ isPublished: true });
+    expect(productUpdateSchema.parse({ isFeatured: true })).toEqual({ isFeatured: true });
     expect(issueOf(productUpdateSchema.safeParse({}))?.message).toBe("Indica qué cambiar");
   });
 
@@ -87,9 +108,22 @@ describe("product list queries", () => {
       pageSize: 12,
       search: "limón",
       category: "VAPES",
+      featured: undefined,
     });
-    expect(productListQuerySchema.parse({ category: "" })).toEqual({ page: 1, pageSize: 12, search: undefined, category: undefined });
+    expect(productListQuerySchema.parse({ category: "", featured: "" })).toEqual({
+      page: 1,
+      pageSize: 12,
+      search: undefined,
+      category: undefined,
+      featured: undefined,
+    });
     expect(productListQuerySchema.safeParse({ category: "FOOD" }).success).toBe(false);
+  });
+
+  it("read the featured filter as a boolean", () => {
+    expect(productListQuerySchema.parse({ featured: "true" }).featured).toBe(true);
+    expect(productListQuerySchema.parse({ featured: "false" }).featured).toBe(false);
+    expect(productListQuerySchema.safeParse({ featured: "maybe" }).success).toBe(false);
   });
 
   it("add the status filter for the admin", () => {

@@ -30,6 +30,7 @@ describe.skipIf(!hasDatabaseUrl)("data model", () => {
     const prisma = await getPrisma();
     const namePattern = { contains: testRunId };
     await prisma.item.deleteMany({ where: { title: namePattern } });
+    await prisma.product.deleteMany({ where: { slug: namePattern } });
     await prisma.user.deleteMany({ where: { email: namePattern } });
     await prisma.$disconnect();
   });
@@ -54,4 +55,34 @@ describe.skipIf(!hasDatabaseUrl)("data model", () => {
     expect(item.isPublished).toBe(false);
     expect(item.createdAt).toBeInstanceOf(Date);
   });
+
+  it("creates products not featured and variants without a previous price by default", async () => {
+    const prisma = await getPrisma();
+    const product = await prisma.product.create({
+      data: {
+        slug: uniqueName("product"),
+        name: "Test product",
+        description: "",
+        category: "TERPENES",
+        variants: { create: { name: "10 ml", sku: uniqueName("SKU").toUpperCase(), priceClp: 9990, stock: 1, position: 0 } },
+      },
+      include: { variants: true },
+    });
+    expect(product.isFeatured).toBe(false);
+    expect(product.variants[0]?.compareAtPriceClp).toBeNull();
+  });
+
+  it("rejects a previous price that is not above the price (DEC-017)", async () => {
+    const prisma = await getPrisma();
+    const product = await prisma.product.create({
+      data: { slug: uniqueName("offer"), name: "Offer product", description: "", category: "TERPENES" },
+    });
+    const variant = (compareAtPriceClp: number) =>
+      prisma.productVariant.create({
+        data: { productId: product.id, name: "10 ml", sku: uniqueName("SKU").toUpperCase(), priceClp: 9990, compareAtPriceClp, stock: 1, position: 0 },
+      });
+    await expect(variant(9990)).rejects.toThrow(/ProductVariant_compareAtPriceClp_check/);
+    await expect(variant(12990)).resolves.toMatchObject({ compareAtPriceClp: 12990 });
+  });
+
 });
