@@ -39,7 +39,7 @@ describe("age gate", () => {
     // A later visit (fresh module state) reads it back from storage.
     resetAgeGate();
     expect(hasConfirmedAge()).toBe(true);
-    expect(storage.getItem("terpenos:age-confirmed")).toBe("1");
+    expect(storage.getItem("terpenex:age-confirmed")).toBe("1");
   });
 
   it("keeps working when storage is blocked, remembering the answer for this page only", () => {

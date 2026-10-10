@@ -39,13 +39,16 @@ const pairs: [string, string, number][] = [
   ["accent", "surface", 4.5],
   ["on-accent", "accent", 4.5],
   ["on-accent", "accent-hover", 4.5],
+  ["on-highlight", "highlight", 4.5],
+  // "Agotado" badge: paper text on an ink pill.
+  ["paper", "ink", 4.5],
 ];
 
 describe("design tokens", () => {
   for (const [mode, tokens] of Object.entries(modes)) {
     it(`${mode} mode defines every role`, () => {
       expect(Object.keys(tokens).sort()).toEqual(
-        ["accent", "accent-hover", "ink", "line", "muted", "on-accent", "paper", "surface"].sort(),
+        ["accent", "accent-hover", "highlight", "ink", "line", "muted", "on-accent", "on-highlight", "paper", "surface"].sort(),
       );
     });
 

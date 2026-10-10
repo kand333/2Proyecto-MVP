@@ -10,7 +10,7 @@ const { cookieStore, redirectMock } = vi.hoisted(() => ({
 
 vi.mock("next/headers", () => ({
   cookies: async () => ({
-    get: (name: string) => (name === "terpenos_session" && cookieStore.value ? { value: cookieStore.value } : undefined),
+    get: (name: string) => (name === "terpenex_session" && cookieStore.value ? { value: cookieStore.value } : undefined),
   }),
 }));
 vi.mock("next/navigation", () => ({ redirect: redirectMock }));
@@ -47,7 +47,7 @@ describe("getSessionUser", () => {
       "http://api.test/api/auth/me",
       expect.objectContaining({
         cache: "no-store",
-        headers: expect.objectContaining({ Cookie: "terpenos_session=signed.token" }),
+        headers: expect.objectContaining({ Cookie: "terpenex_session=signed.token" }),
       }),
     );
   });
@@ -124,7 +124,7 @@ describe("fetchWithSession", () => {
     await expect(fetchWithSession("/api/admin/dashboard")).resolves.toEqual({ users: 4 });
     expect(fetchMock).toHaveBeenCalledWith(
       "http://api.test/api/admin/dashboard",
-      expect.objectContaining({ cache: "no-store", headers: expect.objectContaining({ Cookie: "terpenos_session=signed.token" }) }),
+      expect.objectContaining({ cache: "no-store", headers: expect.objectContaining({ Cookie: "terpenex_session=signed.token" }) }),
     );
   });
 

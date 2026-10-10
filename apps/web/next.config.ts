@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // Backend (@portal/api) reachable from this server. Rewrites are resolved at build time.
-const apiInternalUrl = process.env.API_INTERNAL_URL ?? "http://localhost:4000";
+const apiInternalUrl = process.env.API_INTERNAL_URL ?? "http://localhost:4100";
 
 // Baseline security headers for every page. No CSP yet: Next's inline scripts would need nonces.
 const securityHeaders = [

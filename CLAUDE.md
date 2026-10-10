@@ -16,10 +16,10 @@ Al crear un proyecto desde aquí, cambia la identidad en `packages/shared/src/ap
 
 Monorepo npm workspaces:
 
-- `apps/web` (`@portal/web`, :3000): Next.js 16.3.7 + React 19 + Tailwind 4 + SWR. Sin acceso a BD. De los paquetes internos, depende solo de `@portal/shared`.
+- `apps/web` (`@portal/web`, :3100): Next.js 16.3.7 + React 19 + Tailwind 4 + SWR. Sin acceso a BD. De los paquetes internos, depende solo de `@portal/shared`.
   - El navegador llama a `/api/**`, que `next.config.ts` reenvía a `API_INTERNAL_URL` (cookies first-party, sin CORS).
   - Los Server Components llaman al backend directamente por `API_INTERNAL_URL` (patrones: `lib/session.ts`, `lib/public-items-api.ts`).
-- `apps/api` (`@portal/api`, :4000): solo Route Handlers REST → `services/` → `repositories/` → Prisma 7.10.0 (`adapter-pg`) → PostgreSQL.
+- `apps/api` (`@portal/api`, :4100): solo Route Handlers REST → `services/` → `repositories/` → Prisma 7.10.0 (`adapter-pg`) → PostgreSQL.
   - Errores HTTP con forma `{ message, status }` vía `lib/http/api-error.ts`.
   - Cliente Prisma generado en `apps/api/src/generated/prisma`: no se versiona; `npm run db:generate`.
 - `packages/shared` (`@portal/shared`): contrato REST (tipos, enums, límites, esquemas Zod). Los enums deben coincidir con Prisma (`tests/shared-contract.test.ts`).
@@ -34,7 +34,7 @@ Integraciones opcionales (no instaladas): recetas en `docs/recipes/`.
 - `typecheck` ejecuta `next typegen` (`PageProps`/`LayoutProps`/`RouteContext`): usa el script, no `tsc` solo.
 - `next.config.ts` lleva `agentRules: false` para que `next dev` no modifique este archivo. No lo quites.
 - Estado de listas (página, búsqueda) en la URL, con los mismos nombres de parámetros que la API (`lib/items.ts`).
-- UI: solo tokens de `apps/web/src/app/globals.css` (`paper`, `surface`, `ink`, `muted`, `line`, `accent`, `accent-hover`, `on-accent`). Excepción: rojo/esmeralda para estados de error/éxito. `font-display` y `font-sans` apuntan a la misma fuente por defecto.
+- UI: solo tokens de `apps/web/src/app/globals.css` (`paper`, `surface`, `ink`, `muted`, `line`, `accent`, `accent-hover`, `on-accent`, `highlight`, `on-highlight`; DEC-015). Excepción: rojo/esmeralda para estados de error/éxito. `font-display` es Archivo (ancho con `font-stretch-expanded` / `font-stretch-condensed` de Tailwind) y `font-sans`, Geist.
 - El movimiento respeta `prefers-reduced-motion`.
 - Código, nombres y commits en inglés; UI y docs en español. TypeScript estricto, sin `any`.
 - Valida toda entrada en el backend con los esquemas de `@portal/shared`.

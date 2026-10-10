@@ -6,27 +6,32 @@
  * Direction and contrast ratios: docs/design.md. Font: app/layout.tsx.
  */
 :root {
-  --paper: #f6f8f5;
+  --paper: #f5f8f2;
   --surface: #ffffff;
-  --ink: #14211b;
-  --muted: #4a5a51;
-  --line: #dbe2dc;
-  --accent: #1f6048;
-  --accent-hover: #174a37;
-  --on-accent: #f6f8f5;
-  --shadow-ink: 20 33 27;
+  --ink: #11231a;
+  --muted: #4b5c50;
+  --line: #dbe3d6;
+  --accent: #1e5b2b;
+  --accent-hover: #15461f;
+  --on-accent: #ffffff;
+  /* Brand surface (band, "Oferta" badge, the wordmark X); never text on paper or surface. */
+  --highlight: #f3c623;
+  --on-highlight: #11231a;
+  --shadow-ink: 17 35 26;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #0d1310;
-    --surface: #141c17;
-    --ink: #eef3ef;
-    --muted: #9fb1a6;
-    --line: #26332b;
-    --accent: #6fd0a0;
-    --accent-hover: #8fdcb6;
-    --on-accent: #0d1310;
+    --paper: #0b120d;
+    --surface: #121b15;
+    --ink: #edf4ec;
+    --muted: #a2b4a5;
+    --line: #233229;
+    --accent: #86c96f;
+    --accent-hover: #a1d68e;
+    --on-accent: #0b120d;
+    --highlight: #e8bd1d;
+    --on-highlight: #0b120d;
     --shadow-ink: 0 0 0;
   }
 }
@@ -40,9 +45,11 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-on-accent: var(--on-accent);
+  --color-highlight: var(--highlight);
+  --color-on-highlight: var(--on-highlight);
   --font-sans: var(--font-sans-family);
-  /* Titles and figures. Same family by default; point it to a second font if the project needs one. */
-  --font-display: var(--font-sans-family);
+  /* Titles and the wordmark: Archivo; its width axis answers `font-stretch-expanded` / `-condensed`. */
+  --font-display: var(--font-display-family);
   --shadow-soft: 0 1px 2px rgb(var(--shadow-ink) / 0.05), 0 14px 32px -14px rgb(var(--shadow-ink) / 0.14);
   --shadow-lift: 0 2px 4px rgb(var(--shadow-ink) / 0.06), 0 30px 60px -22px rgb(var(--shadow-ink) / 0.32);
 }
