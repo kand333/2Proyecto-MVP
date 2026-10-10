@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "@/lib/cn";
 
 /**
@@ -29,6 +29,7 @@ type IconButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-label
   label: string;
   /** A decorative Phosphor icon. */
   icon: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 };
 
 /** Button with only an icon (header search, carousel arrows). `type` defaults to "button". */
