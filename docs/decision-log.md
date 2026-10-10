@@ -104,3 +104,30 @@
 - Elegida: `@phosphor-icons/react@2.1.10` (exacta) en `apps/web`, instalada fuera de la cola para que el modo noche no instale nada. Sin Motion: transiciones y keyframes CSS con `prefers-reduced-motion`.
 - Impacto: WS-06, RF-22, T030.
 - Rollback: quitar la dependencia y sustituir los iconos.
+
+## DEC-015 · Identidad Terpenex Company
+- Fecha: 2026-10-09 · Estado: aprobada
+- Problema: el nombre era provisional ("Terpenos & Vapes") y la paleta de T001 tenía un solo acento verde; el usuario aportó el logo definitivo (hojas verdes, gota y "X" amarillas).
+- Evidencia: el usuario eligió "Terpenex Company" con `APP_SLUG = "terpenex"` y wordmark tipográfico + PNG solo para favicon y fondos blancos (el PNG tiene fondo blanco opaco).
+- Opciones: conservadora: mantener un solo acento y usar el amarillo solo en el logo / propuesta: segundo token de superficie `highlight` con `on-highlight`.
+- Elegida: `highlight` como superficie de marca (banda, badge "Oferta", X del wordmark), nunca como texto sobre fondo claro (1,5:1). Archivo variable (`wdth`) para display y wordmark, Geist para cuerpo, vía `next/font` (sin dependencias). Reemplaza la regla "un solo acento" de `docs/design.md` y amplía la lista de tokens de `CLAUDE.md`.
+- Impacto: WS-06, RF-17, RF-23, T032, T034. Cambiar `APP_SLUG` renombra cookies y claves de almacenamiento: las sesiones locales y el aviso de edad aceptado se pierden una vez.
+- Rollback: restaurar tokens, fuente y `APP_SLUG` anteriores desde git.
+
+## DEC-016 · Estructura de bananacompany.cl como referencia
+- Fecha: 2026-10-09 · Estado: aprobada
+- Problema: el usuario quiere la estructura de botones, productos y portada de esa landing "lo más exacta" posible, y varias piezas chocan con `design-taste-frontend` y con el `docs/design.md` anterior.
+- Evidencia: captura completa de bananacompany.cl aportada por el usuario el 2026-10-09 (no se versiona: es de un tercero; su estructura queda descrita en `docs/design.md`).
+- Opciones: conservadora: tomar solo el orden de bloques / propuesta: copiar la estructura de bloques, header, botones y tarjetas con tokens y tipografía propios.
+- Elegida: la propuesta. Excepciones explícitas a la skill: badge de estado sobre la imagen del producto (estado real, no decoración), una única cinta en bucle (se pausa con hover/foco y se detiene con reduced motion) y titulares de marca en mayúsculas condensadas (no son eyebrows). No se copian textos, mascota ni imágenes.
+- Impacto: WS-06, WS-04, RF-24, RF-25, RF-26, RF-28, T034, T035, T036, T037, T038, T039.
+- Rollback: volver a la sección "Pantallas clave" anterior de `docs/design.md` (git).
+
+## DEC-017 · Ofertas y destacados en el modelo
+- Fecha: 2026-10-09 · Estado: aprobada
+- Problema: la estructura de referencia muestra "Oferta" con precio tachado y una colección destacada; el modelo de T005 no tiene esos datos.
+- Evidencia: el usuario aprobó incluir ambos.
+- Opciones: conservadora: carrusel con los más recientes y sin ofertas / propuesta: `ProductVariant.compareAtPriceClp Int?` y `Product.isFeatured Boolean`.
+- Elegida: la propuesta, en una migración nueva `add_offers_featured` (T005 ya está hecha) con `CHECK (compareAtPriceClp IS NULL OR compareAtPriceClp > priceClp)` y la misma regla en shared. La tarjeta usa la variante activa más barata; "Agotado" reemplaza a "Oferta". El precio de referencia lo carga el admin y debe ser real (revisión legal).
+- Impacto: WS-01, RF-27, T033, T006, T007, T008, T009, T010, T034, T038.
+- Rollback: migración que elimina ambas columnas; la UI deja de mostrar "Oferta" y la portada oculta la colección.
