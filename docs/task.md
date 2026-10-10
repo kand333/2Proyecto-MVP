@@ -30,35 +30,35 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T004
   - done: dado `Product` (slug único, categoría enum, publicado, archivado) y `ProductVariant` (SKU único, precio Int, stock Int, activa) migrados con `add_catalog`, cuando corre `shared-contract.test.ts`, entonces `PRODUCT_CATEGORIES` coincide con el enum de Prisma
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T033** Ofertas y destacados: contrato y migración (WS-01 · RF-27 · M)
+- [x] **T033** Ofertas y destacados: contrato y migración (WS-01 · RF-27 · M)
   - deps: T005
   - done: dado `product.ts` en shared con `compareAtPriceClp` (opcional, nullable, entero > `priceClp`), `isFeatured`, `featured` en la lista pública y los campos nuevos de los DTO públicos (plan WS-01), y `Product.isFeatured` + `ProductVariant.compareAtPriceClp` migrados con `add_offers_featured` (CHECK en SQL), cuando corren los tests de shared y `shared-contract.test.ts`, entonces el esquema rechaza `compareAtPriceClp` ≤ `priceClp` con el error en ese campo, acepta `null` y los productos existentes quedan con `isFeatured = false`
   - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm run typecheck`
-- [ ] **T034** Kit de UI según la referencia (WS-06 · RF-22,RF-27 · M)
+- [x] **T034** Kit de UI según la referencia (WS-06 · RF-22,RF-27 · M)
   - deps: T032, T033
   - done: dado `components/ui/` con la tabla Componentes de `docs/design.md` (`Button` 4 px con `iconEnd`, `IconButton` con `aria-label` obligatorio y contador, `Badge` `offer`/`soldOut`, `Price` con `compareAtClp`, `ProductCard` 1:1 sin borde, `ProductCarousel` con anterior/siguiente y campo `underline`), cuando corren sus tests con `renderToStaticMarkup`, entonces un producto agotado y en oferta muestra solo "Agotado", el precio anterior va en `<s>` precedido de "Precio anterior" `sr-only`, ningún botón lleva "→" escrito y `web-design-guidelines` no deja hallazgos críticos en `components/ui/`
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T036** Página de contacto (WS-06 · RF-28 · S)
+- [x] **T036** Página de contacto (WS-06 · RF-28 · S)
   - deps: T032
   - done: dado `/contact` con los canales de `siteConfig.contact` e iconos Phosphor, cuando hay solo email y WhatsApp, entonces se ven esos dos con enlaces `mailto:` y `https://wa.me/`; con todos vacíos, un `EmptyState` sin enlaces
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T006** Repositorio, servicio y API admin de productos (WS-01 · RF-01,RF-27 · L)
+- [x] **T006** Repositorio, servicio y API admin de productos (WS-01 · RF-01,RF-27 · L)
   - deps: T005, T033
   - done: dado `/api/admin/products` (GET paginado con búsqueda, POST) y `/api/admin/products/[id]` (GET, PATCH con variantes, DELETE = archivar) con `requireAdmin`, que guardan `isFeatured` y `compareAtPriceClp`, cuando corre `tests/products-admin-api.test.ts`, entonces cubre 201, 400 (incluido `compareAtPriceClp` ≤ precio), 401/403, 404 y 409 por slug o SKU repetido
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T007** API pública del catálogo (WS-01 · RF-02,RF-03,RF-27 · M)
+- [x] **T007** API pública del catálogo (WS-01 · RF-02,RF-03,RF-27 · M)
   - deps: T005, T033
   - done: dado `GET /api/products?category&search&featured&page` y `GET /api/products/[slug]`, cuando corre `tests/products-public-api.test.ts`, entonces solo devuelve productos publicados, no archivados y con ≥ 1 variante activa; `featured=true` devuelve solo destacados; `compareAtFromClp` sale de la variante activa más barata (`null` si no tiene); slug despublicado → 404
   - verify: `npm test -w @portal/api && npm run typecheck`
-- [ ] **T008** Seed de productos demo (WS-01 · RF-02 · S)
+- [x] **T008** Seed de productos demo (WS-01 · RF-02 · S)
   - deps: T005
   - done: dado `npm run db:seed` ejecutado dos veces, cuando se consulta la BD, entonces hay 8 productos demo (2 por categoría) con variantes, 4 destacados y 2 con precio anterior en su variante más barata, sin duplicados
   - verify: `npm run db:seed -w @portal/api && npm run db:seed -w @portal/api && npm test -w @portal/api`
-- [ ] **T009** Admin web de productos (WS-01 · RF-01,RF-27 · L)
+- [x] **T009** Admin web de productos (WS-01 · RF-01,RF-27 · L)
   - deps: T006, T030
   - done: dado `/admin/products`, `/admin/products/new` y `/admin/products/[id]/edit` (cada página con `getAdminUser`) y la entrada en `lib/admin-navigation.ts`, con "Destacado en portada" y "Precio anterior" opcional por variante, cuando el admin crea un producto destacado con 2 variantes, entonces aparece en el listado con `flash()` y los errores 400/409 se muestran junto al campo
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T010** Catálogo y ficha públicos (WS-01 · RF-02,RF-03 · L)
+- [x] **T010** Catálogo y ficha públicos (WS-01 · RF-02,RF-03 · L)
   - deps: T007, T030
   - done: dado `/products` con filtros en la URL y `/products/[slug]` con selector de variante, cuando la variante elegida tiene stock 0, entonces muestra "Agotado" y deshabilita "Añadir al carrito"; las categorías `VAPES` y `E_LIQUIDS` muestran la advertencia sanitaria; sin fotos (llegan en T029) se ve el marcador de `ProductCard`; una variante con precio anterior lo muestra tachado en la ficha
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
@@ -131,11 +131,11 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T026
   - done: dado `apps/api/src/lib/csv.ts` con tests de comas, comillas, saltos de línea, BOM y `=cmd`, `GET /api/admin/subscribers/export` con `requireAdmin` (`text/csv; charset=utf-8`, adjunto `subscribers.csv`, `Cache-Control: no-store`) y el enlace «Exportar CSV» en `/admin/subscribers`, cuando un admin lo descarga, entonces recibe cabecera + filas escapadas; sin sesión 401, USER 403
   - verify: `npm test -w @portal/api && npm test -w @portal/web && npm run lint && npm run typecheck`
-- [ ] **T028** Fotos de producto: modelo, Cloudinary y API (WS-01 · RF-21 · L)
+- [x] **T028** Fotos de producto: modelo, Cloudinary y API (WS-01 · RF-21 · L)
   - deps: T006
   - done: dado `ProductImage` (url, `publicId` único, posición) migrado, `product-image.ts` en shared (tipos, `MAX_IMAGE_BYTES`, `MAX_PRODUCT_IMAGES = 8`, `detectImageType`), `apps/api/src/lib/cloudinary.ts` y `POST /api/admin/products/[id]/images` + `DELETE …/images/[imageId]` con `requireAdmin`, todo según `docs/recipes/cloudinary.md` adaptado a Product, cuando corren los tests con `fetch` simulado, entonces cubren 201, 400, 413, 415, 404, 409 al superar 8 fotos, 503 sin claves y borrado en Cloudinary antes que en BD. Añade los nombres `CLOUDINARY_*` vacíos a `.env.example` y a los tests de env (DEC-012); los valores no son parte de la tarea
   - verify: `npm test -w @portal/shared && npm test -w @portal/api && npm test -w @portal/web && npm run typecheck`
-- [ ] **T029** Fotos de producto en la web (WS-01 · RF-21 · M)
+- [x] **T029** Fotos de producto en la web (WS-01 · RF-21 · M)
   - deps: T028, T009, T010
   - done: dado el uploader en `/admin/products/[id]/edit` (`postForm` de `lib/api-client.ts`, errores junto al campo, borrar con `ConfirmDialog`), `lib/image-loader.ts` y el bloque `images` en `apps/web/next.config.ts` (sin tocar `agentRules`), cuando un producto tiene 3 fotos, entonces el catálogo muestra la primera con `next/image` y la ficha las 3 con texto alternativo
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
@@ -147,7 +147,7 @@ Una tarea = una sesión = un PR. Tareas web: la revisión en navegador (escritor
   - deps: T015, T035
   - done: dado `footer-subscribe.tsx` en el pie con campo `underline`, consentimiento obligatorio y la misma llamada a `POST /api/subscribers` que el popup, cuando se suscribe un email, entonces muestra su código con botón de copiar; sin consentimiento, el error aparece junto al checkbox sin llamar a la API
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
-- [ ] **T038** Portada según la referencia (WS-06 · RF-25 · L)
+- [x] **T038** Portada según la referencia (WS-06 · RF-25 · L)
   - deps: T007, T034 (adelantada al nuevo header y pie por pedido del usuario el 2026-10-10: usa el header actual)
   - done: dado `/` con los bloques de `docs/design.md` en orden (hero con "Explorar", cinta, colección destacada, banda de marca, sección dividida, quiénes somos) y `lib/home-content.ts` con imágenes `null`, cuando corren los tests con `renderToStaticMarkup`, entonces los bloques salen en ese orden, cada slot de imagen sin archivo muestra el panel de marca con la misma relación de aspecto, sin destacados no se renderiza la colección, la cinta lleva su copia duplicada con `aria-hidden` y no hay rayas (em/en dash) en los textos visibles
   - verify: `npm test -w @portal/web && npm run lint -w @portal/web && npm run typecheck`
