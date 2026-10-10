@@ -31,6 +31,7 @@ model User {
   lastSeenAt   DateTime?
   // Logout time: offline at once while keeping lastSeenAt (online only when lastSeenAt is later).
   loggedOutAt  DateTime?
+  orders       Order[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -78,6 +79,7 @@ model ProductVariant {
   stock     Int
   isActive  Boolean @default(true)
   position  Int
+  orderItems OrderItem[]
 
   @@index([productId, position])
 }
@@ -94,6 +96,108 @@ model Item {
   updatedAt   DateTime @updatedAt
 
   @@index([isPublished, createdAt])
+}
+
+// Welcome code subscriber (RF-12, RF-13). The code gives 10 % off one first order.
+model Subscriber {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  // Stored trimmed and lowercase by the shared schema.
+  email            String    @unique
+  code             String    @unique
+  marketingConsent Boolean
+  consentAt        DateTime  @default(now())
+  // Set when an order uses the code; cleared again if that order is cancelled (RF-15).
+  redeemedAt       DateTime?
+  // The order that redeemed the code; one code per order.
+  redeemedOrderId  String?   @unique @db.Uuid
+  redeemedOrder    Order?    @relation(fields: [redeemedOrderId], references: [id], onDelete: SetNull)
+
+  @@index([consentAt])
+}
+
+// Shop settings (RF-10): a single row with id 1, created by its migration. Neutral defaults until the
+// admin sets real values in /admin/settings.
+model ShopSettings {
+  id                   Int      @id @default(1)
+  flatShippingClp      Int      @default(0)
+  // Subtotal from which delivery is free; null = never free.
+  freeShippingFromClp  Int?
+  pickupAddress        String   @default("")
+  transferInstructions String   @default("")
+  updatedAt            DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum ShippingMethod {
+  DELIVERY
+  PICKUP
+}
+
+// An order (RF-08, RF-09): placed as a guest or with an account; totals are computed by the server.
+model Order {
+  id             String         @id @default(uuid(7)) @db.Uuid
+  // Correlative number shown to the customer and the admin.
+  number         Int            @unique @default(autoincrement())
+  // Secret of /orders/[token] (DEC-007): 32 random bytes in base64url. The id is never exposed.
+  accessToken    String         @unique
+  // Guest orders have no user and are never linked by email (RF-16).
+  userId         String?        @db.Uuid
+  user           User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email          String
+  name           String
+  phone          String
+  birthDate      DateTime       @db.Date
+  status         OrderStatus    @default(PENDING_PAYMENT)
+  shippingMethod ShippingMethod
+  // Delivery address (null for pickup). The region is an ISO 3166-2:CL code (shared CHILE_REGIONS).
+  region         String?
+  commune        String?
+  street         String?
+  addressExtra   String?
+  // Whole CLP (DEC-003). CHECKs (non-negative, total = subtotal - discount + shipping) live in the migration SQL.
+  subtotalClp    Int
+  discountClp    Int            @default(0)
+  shippingClp    Int
+  totalClp       Int
+  discountCode   String?
+  trackingNumber String?
+  items          OrderItem[]
+  redeemedCode   Subscriber?
+  paidAt         DateTime?
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+  cancelledAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@index([userId, createdAt])
+}
+
+// One line of an order, with a snapshot of what was bought: later product edits never change it.
+model OrderItem {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  orderId      String         @db.Uuid
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // Restrict: a variant with orders is deactivated, never deleted.
+  variantId    String         @db.Uuid
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  productName  String
+  variantName  String
+  sku          String
+  unitPriceClp Int
+  quantity     Int
+
+  @@index([orderId])
+  @@index([variantId])
 }
 
 // Product photo stored in Cloudinary (RF-21, DEC-012): only the URL and the public id, never the file.
