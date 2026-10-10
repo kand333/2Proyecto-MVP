@@ -3,6 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { hashPassword } from "../src/lib/auth/password";
 import { getRequiredEnvironmentVariable } from "../src/lib/environment";
+import { DEMO_PRODUCTS } from "./seed/products";
 import { TEST_USER_PASSWORD, TEST_USERS } from "./seed/test-users";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
@@ -35,6 +36,14 @@ async function main() {
     }
     if ((await prisma.item.count()) === 0) {
       await prisma.item.createMany({ data: EXAMPLE_ITEMS });
+    }
+    // By slug, and never overwritten: the admin may have edited a demo product since.
+    for (const { variants, ...product } of DEMO_PRODUCTS) {
+      await prisma.product.upsert({
+        where: { slug: product.slug },
+        update: {},
+        create: { ...product, variants: { create: variants.map((variant, position) => ({ ...variant, position })) } },
+      });
     }
 
     console.log(`Seed completed. Users (password: ${TEST_USER_PASSWORD}):`);
