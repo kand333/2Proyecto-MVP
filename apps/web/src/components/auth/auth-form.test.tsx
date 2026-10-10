@@ -51,12 +51,12 @@ describe("AuthForm", () => {
     vi.mocked(useCurrentUser).mockReturnValue({
       data: { id: "u1", name: "Ana Rojas", email: "ana@example.com", role: "USER", isActive: true },
     } as ReturnType<typeof useCurrentUser>);
-    currentSearch = "next=%2Fitems";
+    currentSearch = "next=%2Fproducts";
 
     const html = renderToStaticMarkup(<AuthForm mode="login" />);
     expect(html).toContain("Ya iniciaste sesión como <span");
     expect(html).toContain("Ana Rojas");
-    expect(html).toContain('href="/items"');
+    expect(html).toContain('href="/products"');
     expect(html).toContain("Cerrar sesión");
     expect(html).not.toContain("<form");
   });
