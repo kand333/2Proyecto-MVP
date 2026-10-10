@@ -53,11 +53,15 @@ model Product {
   isPublished Boolean         @default(false)
   // Archiving replaces deletion: orders keep pointing at its variants.
   isArchived  Boolean         @default(false)
+  // Shown in the home page's featured collection (RF-27).
+  isFeatured  Boolean         @default(false)
   variants    ProductVariant[]
+  images      ProductImage[]
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
   @@index([isPublished, isArchived, category])
+  @@index([isFeatured])
 }
 
 model ProductVariant {
@@ -69,6 +73,8 @@ model ProductVariant {
   sku       String  @unique
   // Whole CLP (DEC-003). CHECK priceClp > 0 and stock >= 0 live in the migration SQL.
   priceClp  Int
+  // Previous price of an offer (DEC-017). CHECK compareAtPriceClp > priceClp lives in the migration SQL.
+  compareAtPriceClp Int?
   stock     Int
   isActive  Boolean @default(true)
   position  Int
@@ -88,4 +94,19 @@ model Item {
   updatedAt   DateTime @updatedAt
 
   @@index([isPublished, createdAt])
+}
+
+// Product photo stored in Cloudinary (RF-21, DEC-012): only the URL and the public id, never the file.
+model ProductImage {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  productId String   @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  // Cloudinary public_id: required to delete the remote asset.
+  publicId  String   @unique
+  // 0 is the cover of the catalog card.
+  position  Int
+  createdAt DateTime @default(now())
+
+  @@index([productId, position])
 }

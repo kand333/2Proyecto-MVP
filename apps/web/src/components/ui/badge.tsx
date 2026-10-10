@@ -1,13 +1,16 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export type BadgeTone = "neutral" | "accent" | "success" | "danger";
+export type BadgeTone = "neutral" | "accent" | "success" | "danger" | "offer" | "soldOut";
 
 const toneClassNames: Record<BadgeTone, string> = {
   neutral: "border-line bg-paper text-muted",
   accent: "border-accent/40 bg-accent/10 text-accent",
   success: "border-emerald-600/40 bg-emerald-600/10 text-emerald-800 dark:border-emerald-400/40 dark:text-emerald-300",
   danger: "border-red-600/40 bg-red-600/10 text-red-800 dark:border-red-400/40 dark:text-red-300",
+  // Solid pills over product photos (docs/design.md).
+  offer: "border-highlight bg-highlight text-on-highlight",
+  soldOut: "border-ink bg-ink text-paper",
 };
 
 /** Short status label ("Agotado", "Pagado"). The only pill shape of the site (docs/design.md). */

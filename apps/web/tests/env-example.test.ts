@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const requiredVariableNames = ["NEXT_PUBLIC_SITE_URL", "API_INTERNAL_URL"];
 
 // Backend-only variables that must never reach the frontend app.
-const backendVariableNames = ["DATABASE_URL", "AUTH_SECRET"];
+const backendVariableNames = ["DATABASE_URL", "AUTH_SECRET", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 
 function parseEnvironmentFile(content: string): Map<string, string> {
   const variables = new Map<string, string>();

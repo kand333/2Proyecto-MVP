@@ -52,10 +52,16 @@ export function Field({ id, label, hint, error, className, children }: FieldProp
 
 // Explicit background and text color: native controls follow them in every OS theme.
 const controlClassName =
-  "w-full rounded-lg border border-line bg-surface px-3.5 text-base text-ink transition-colors duration-200 hover:border-accent/60 focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-red-600 dark:aria-invalid:border-red-400";
+  "w-full rounded-sm border border-line bg-surface px-3.5 text-base text-ink transition-colors duration-200 hover:border-accent/60 focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-red-600 dark:aria-invalid:border-red-400";
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cn(controlClassName, "h-11", className)} {...props} />;
+// Footer subscription only (docs/design.md): no box, a single ink rule under the text.
+const underlineClassName =
+  "w-full border-0 border-b border-ink bg-transparent px-0 text-base text-ink transition-colors duration-200 focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-red-600 dark:aria-invalid:border-red-400";
+
+type InputProps = InputHTMLAttributes<HTMLInputElement> & { variant?: "box" | "underline" };
+
+export function Input({ variant = "box", className, ...props }: InputProps) {
+  return <input className={cn(variant === "box" ? controlClassName : underlineClassName, "h-11", className)} {...props} />;
 }
 
 export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {

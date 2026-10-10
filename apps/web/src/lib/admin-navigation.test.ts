@@ -5,6 +5,7 @@ describe("adminNavigationItems", () => {
   it("lists the sections in order", () => {
     expect(adminNavigationItems.map((item) => item.label)).toEqual([
       "Panel administración",
+      "Administrar productos",
       "Administrar items",
       "Administrar usuarios",
       "Mi cuenta",
@@ -16,6 +17,8 @@ describe("getActiveAdminSection", () => {
   it.each([
     ["/admin", "dashboard"],
     ["/admin/users", "users"],
+    ["/admin/products", "products"],
+    ["/admin/products/11111111-1111-4111-8111-111111111111/edit", "products"],
     ["/admin/items", "items"],
     ["/admin/items/new", "items"],
     ["/admin/items/11111111-1111-4111-8111-111111111111/edit", "items"],

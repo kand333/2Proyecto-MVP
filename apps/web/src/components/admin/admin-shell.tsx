@@ -16,6 +16,7 @@ const SIDEBAR_ID = "admin-sidebar";
 /** Outline icons drawn inline (no icon library). */
 const iconPaths: Record<AdminSection | "site" | "logout" | "collapse" | "menu", string> = {
   dashboard: "M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z",
+  products: "M4 7.5 12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9",
   items: "M4 6h16M4 12h16M4 18h10",
   users: "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7M22 21a6 6 0 0 0-4-5.6",
   account: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0",

@@ -25,7 +25,12 @@ const nextConfig: NextConfig = {
   // Do not advertise the framework in every response.
   poweredByHeader: false,
   transpilePackages: ["@portal/shared"],
-  // Remote images (CDN loader, allowed hosts): see docs/recipes/cloudinary.md.
+  // Product photos from Cloudinary, resized by its CDN at the width next/image asks for (DEC-012).
+  images: {
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
+    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" }],
+  },
   // The browser only talks to this origin: /api/** is proxied to the backend,
   // so session cookies stay first-party and no CORS is needed.
   async headers() {
