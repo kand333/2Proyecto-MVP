@@ -48,3 +48,43 @@ model Item {
 
   @@index([isPublished, createdAt])
 }
+
+// Must match PRODUCT_CATEGORIES in @portal/shared (tests/shared-contract.test.ts).
+enum ProductCategory {
+  TERPENES
+  VAPES
+  E_LIQUIDS
+  ACCESSORIES
+}
+
+model Product {
+  id          String           @id @default(uuid(7)) @db.Uuid
+  slug        String           @unique
+  name        String
+  description String
+  category    ProductCategory
+  // Only published, non-archived products with an active variant reach the public catalog.
+  isPublished Boolean          @default(false)
+  // Soft delete: products are archived, never removed (order history keeps its snapshot).
+  isArchived  Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  variants    ProductVariant[]
+
+  @@index([isPublished, isArchived, category])
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid(7)) @db.Uuid
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  sku       String  @unique
+  // Whole Chilean pesos (DEC-003).
+  priceClp  Int
+  stock     Int
+  isActive  Boolean @default(true)
+  position  Int     @default(0)
+
+  @@index([productId, position])
+}
